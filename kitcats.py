@@ -7,14 +7,14 @@ screen = pygame.display.set_mode((width, height), pygame.RESIZABLE)
 
 #Icon & Name's bar
 pygame.display.set_caption("KITCATS")
-icons = pygame.image.load("./assets/geometry.png")
+icons = pygame.image.load("geometry.png")
 pygame.display.set_icon(icons)
 
 #Game menu element image
-background = pygame.image.load("./assets/Menu.jpg") #Menu's background image
-gamename = pygame.image.load("./assets/name.png") #Game's name image
-start_button = pygame.image.load("./assets/start.png") #Start button
-quit_button = pygame.image.load("./assets/quit.png") #Quit button
+background = pygame.image.load("Menu.jpg") #Menu's background image
+gamename = pygame.image.load("name.png") #Game's name image
+start_button = pygame.image.load("start.png") #Start button
+quit_button = pygame.image.load("quit.png") #Quit button
 
 #start & quit button size
 start_button = pygame.transform.scale(start_button, (200, 70))
@@ -90,7 +90,7 @@ while running:
         #Quit comfirm window
         elif current_screen == "confirm":
             screen.fill((0,0,0))
-            confirm_page = pygame.image.load("./assets/confirm.png")
+            confirm_page = pygame.image.load("confirm.png")
 
             #Adjust confirm window
             def confirm_quit(size):
@@ -101,10 +101,11 @@ while running:
             confirm_rect = confirm_page.get_rect(center=(width // 2, height // 2))
             screen.blit(confirm_page, confirm_rect)
 
+            #Confirm button
             yes_confirm = pygame.image.load("yesconfirm.png") #confirm button
             yes_confirm = pygame.transform.scale(yes_confirm, (150, 75))
             yes_confirm_pos = (width // 2 - confirm_page.get_width() // 400, height // height + (height*0.52))
-            not_confirm = pygame.image.load("./assets/notconfirm.png") #back to menu
+            not_confirm = pygame.image.load("notconfirm.png") #back to menu
             not_confirm = pygame.transform.scale(not_confirm, (150, 75))
             not_confirm_pos = (width // 2 - confirm_page.get_width() // 3.6, height // height + (height*0.52))
             screen.blit(yes_confirm, yes_confirm_pos)
