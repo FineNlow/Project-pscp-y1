@@ -1,20 +1,19 @@
-import pygame
-import sys
+import pygame, sys
 
 pygame.init()
-width, height = 800, 600
+width, height = 1440, 1024
 screen = pygame.display.set_mode((width, height), pygame.RESIZABLE)
 
 #Icon & Name's bar
 pygame.display.set_caption("KITCATS")
-icons = pygame.image.load("geometry.png")
+icons = pygame.image.load("./assets/menu/geometry.png")
 pygame.display.set_icon(icons)
 
 #Game menu element image
-background = pygame.image.load("Menu.jpg") #Menu's background image
-gamename = pygame.image.load("name.png") #Game's name image
-start_button = pygame.image.load("start.png") #Start button
-quit_button = pygame.image.load("quit.png") #Quit button
+background = pygame.image.load("./assets/menu/cat-background (2).png") #Menu's background image
+gamename = pygame.image.load("./assets/menu/name.png") #Game's name image
+start_button = pygame.image.load("./assets/menu/start.png") #Start button
+quit_button = pygame.image.load("./assets/menu/quit.png") #Quit button
 
 #start & quit button size
 start_button = pygame.transform.scale(start_button, (200, 70))
@@ -29,12 +28,12 @@ def game_name(size):
     return pygame.transform.scale(gamename, size)
 
 #Other button
-close_tab = pygame.image.load("x.png")
+close_tab = pygame.image.load("./assets/yes no btn/x.png")
 def closed(size):
     return pygame.transform.scale(close_tab, size)
 
 close_tab = closed((width*0.04, height*0.06))
-close_tab_pos = (width // (height-(height*0.99825)) + close_tab.get_width() // width, height // height*0.2)
+close_tab_pos = (width // (height-(height*9.5)) + close_tab.get_width() // width, height // height**0.8)
 
 #Check button click
 def check_button_click(image, x, y):
@@ -90,7 +89,7 @@ while running:
         #Quit comfirm window
         elif current_screen == "confirm":
             screen.fill((0,0,0))
-            confirm_page = pygame.image.load("confirm.png")
+            confirm_page = pygame.image.load("./assets/menu/confirm.png")
 
             #Adjust confirm window
             def confirm_quit(size):
@@ -102,10 +101,10 @@ while running:
             screen.blit(confirm_page, confirm_rect)
 
             #Confirm button
-            yes_confirm = pygame.image.load("yesconfirm.png") #confirm button
+            yes_confirm = pygame.image.load("./assets/yes no btn/yesconfirm.png") #confirm button
             yes_confirm = pygame.transform.scale(yes_confirm, (150, 75))
             yes_confirm_pos = (width // 2 - confirm_page.get_width() // 400, height // height + (height*0.52))
-            not_confirm = pygame.image.load("notconfirm.png") #back to menu
+            not_confirm = pygame.image.load("./assets/yes no btn/notconfirm.png") #back to menu
             not_confirm = pygame.transform.scale(not_confirm, (150, 75))
             not_confirm_pos = (width // 2 - confirm_page.get_width() // 3.6, height // height + (height*0.52))
             screen.blit(yes_confirm, yes_confirm_pos)
@@ -123,7 +122,7 @@ while running:
         #Select level window
         elif current_screen == "level":
             screen.fill((0,0,0))
-            levelground = pygame.image.load("Select Level.jpg")
+            levelground = pygame.image.load("./assets/cat-backgound resource/cat-background (9).png")
 
             #Adjust select level background image
             def update_background(size):
@@ -132,7 +131,7 @@ while running:
             levelground = update_background((width, height))
             screen.blit(levelground, (0,0))
 
-            select_level = pygame.image.load("select text.png")
+            select_level = pygame.image.load("./assets/select_level/select text.png")
             
             #Adjust select level text image
             def level_selected(size):
@@ -143,22 +142,22 @@ while running:
             screen.blit(select_level, select_level_pos)
 
             #child play button
-            level_child = pygame.image.load("click child.png")
+            level_child = pygame.image.load("./assets/select_level/click child.png")
             level_child= pygame.transform.scale(level_child, (170, 220))
             level_child_pos = (width // 15 - levelground.get_width() // 50, height // height + (height*0.3))
 
             #easy mode button
-            level_easy = pygame.image.load("click easy.png")
+            level_easy = pygame.image.load("./assets/select_level/click easy.png")
             level_easy= pygame.transform.scale(level_easy, (170, 220))
             level_easy_pos = (width // 3.4 - levelground.get_width() // 300, height // height + (height*0.3))
 
             #medium mode button
-            level_medium = pygame.image.load("click medium.png")
+            level_medium = pygame.image.load("./assets/select_level/click medium.png")
             level_medium= pygame.transform.scale(level_medium, (170, 220))
             level_medium_pos = (width // 1.87 - levelground.get_width() // 550, height // height + (height*0.3))
 
             #hard mode button
-            level_hard = pygame.image.load("click hard.png")
+            level_hard = pygame.image.load("./assets/select_level/click hard.png")
             level_hard= pygame.transform.scale(level_hard, (170, 220))
             level_hard_pos = (width // 1.3 - levelground.get_width() // 700, height // height + (height*0.3))
 
@@ -190,7 +189,7 @@ while running:
 
         elif current_screen == "back menu":
             screen.fill((0,0,0))
-            quit_level_page = pygame.image.load("quit level.png")
+            quit_level_page = pygame.image.load("./assets/quit/quit level.png")
 
             #Adjust confirm window
             def level_confirm_quit(size):
@@ -202,10 +201,10 @@ while running:
             screen.blit(quit_level_page, quit_level_rect)
 
             #Confirm button
-            yes_confirm = pygame.image.load("yesconfirm.png") #confirm button
+            yes_confirm = pygame.image.load("./assets/yes no btn/yesconfirm.png") #confirm button
             yes_confirm = pygame.transform.scale(yes_confirm, (150, 75))
             yes_confirm_pos = (width // 2 - quit_level_page.get_width() // 400, height // height + (height*0.52))
-            not_confirm = pygame.image.load("notconfirm.png") #back to menu
+            not_confirm = pygame.image.load("./assets/yes no btn/notconfirm.png") #back to menu
             not_confirm = pygame.transform.scale(not_confirm, (150, 75))
             not_confirm_pos = (width // 2 - quit_level_page.get_width() // 3.6, height // height + (height*0.52))
 
@@ -221,7 +220,7 @@ while running:
         #Child play mode window
         elif current_screen == "child play":
             screen.fill((0,0,0))
-            childground = pygame.image.load("child play.jpg")
+            childground = pygame.image.load("./assets/child play/Child Play.jpg")
 
             #Adjust select level background image
             def update_background(size):
@@ -238,7 +237,7 @@ while running:
         #Easy mode window
         elif current_screen == "easy mode":
             screen.fill((0,0,0))
-            easyground = pygame.image.load("easy mode.jpg")
+            easyground = pygame.image.load("./assets/easy mode/Easy.gif")
 
             #Adjust select level background image
             def update_background(size):
@@ -255,7 +254,7 @@ while running:
         #Medium mode window
         elif current_screen == "medium mode":
             screen.fill((0,0,0))
-            mediumground = pygame.image.load("medium mode.jpg")
+            mediumground = pygame.image.load("./assets/medium mode/Medium.jpg")
 
             #Adjust select level background image
             def update_background(size):
@@ -272,7 +271,7 @@ while running:
         #Hard mode window
         elif current_screen == "hard mode":
             screen.fill((0,0,0))
-            hardground = pygame.image.load("Hard mode.jpg")
+            hardground = pygame.image.load("./assets/hard mode/Hard.jpg")
 
             #Adjust select level background image
             def update_background(size):
@@ -288,7 +287,7 @@ while running:
 
         elif current_screen == "quit level":
             screen.fill((0,0,0))
-            quit_level_page = pygame.image.load("quit level.png")
+            quit_level_page = pygame.image.load("./assets/quit/quit level.png")
 
             #Adjust confirm window
             def level_confirm_quit(size):
@@ -300,10 +299,10 @@ while running:
             screen.blit(quit_level_page, quit_level_rect)
 
             #Confirm button
-            yes_confirm = pygame.image.load("yesconfirm.png") #confirm button
+            yes_confirm = pygame.image.load("./assets/yes no btn/yesconfirm.png") #confirm button
             yes_confirm = pygame.transform.scale(yes_confirm, (150, 75))
             yes_confirm_pos = (width // 2 - quit_level_page.get_width() // 400, height // height + (height*0.52))
-            not_confirm = pygame.image.load("notconfirm.png") #back to menu
+            not_confirm = pygame.image.load("./assets/yes no btn/notconfirm.png") #back to menu
             not_confirm = pygame.transform.scale(not_confirm, (150, 75))
             not_confirm_pos = (width // 2 - quit_level_page.get_width() // 3.6, height // height + (height*0.52))
 
