@@ -1,23 +1,39 @@
 import pygame, sys
+from PIL import Image
+import os
 
+#game screen .. 100%
 pygame.init()
-width, height = 1440, 1024
+width, height = 800, 600
 screen = pygame.display.set_mode((width, height), pygame.RESIZABLE)
 
-#Icon & Name's bar
+#icon & name's bar ... 100%
 pygame.display.set_caption("KITCATS")
-icons = pygame.image.load("./assets/menu/geometry.png")
+icons = pygame.image.load("./assets/menu/cat-logo.png").convert_alpha()
 pygame.display.set_icon(icons)
 
-#Game menu element image
-background = pygame.image.load("./assets/menu/cat-background (2).png") #Menu's background image
-gamename = pygame.image.load("./assets/menu/name.png") #Game's name image
-start_button = pygame.image.load("./assets/menu/start.png") #Start button
-quit_button = pygame.image.load("./assets/menu/quit.png") #Quit button
+#Game menu element image ... 99%
+background = screen.fill((226, 179, 209))
+gamename = pygame.image.load("./assets/menu/name.png").convert_alpha() #Game's name image
 
-#start & quit button size
-start_button = pygame.transform.scale(start_button, (200, 70))
-quit_button = pygame.transform.scale(quit_button, (200, 70))
+#convert gif to show frame by frame ... 20%
+def gifgen(gif_path, scale_factor):
+    im = Image.open(gif_path)
+    frames = []
+    
+    while True:
+        frame = im.copy().convert("RGBA")
+        frame = pygame.image.fromstring(frame.tobytes(), frame.size, "RGBA")
+        # Scale the frame
+        frame = pygame.transform.scale(frame, (int(frame.get_width() * scale_factor), int(frame.get_height() * scale_factor)))
+        frames.append(frame)
+
+        try:
+            im.seek(len(frames))  # Move to the next frame
+        except EOFError:
+            break
+
+    return frames
 
 #Adjust background image
 def update_background(size):
@@ -35,6 +51,14 @@ def closed(size):
 close_tab = closed((width*0.04, height*0.06))
 close_tab_pos = (width // (height-(height*9.5)) + close_tab.get_width() // width, height // height**0.8)
 
+start_button = pygame.image.load("./assets/menu/start.png").convert_alpha() #Start button
+def started(size):
+    return pygame.transform.scale(start_button, size)
+
+quit_button = pygame.image.load("./assets/menu/quit.png").convert_alpha() #Quit button
+def quited(size):
+        return pygame.transform.scale(quit_button, size)
+
 #Check button click
 def check_button_click(image, x, y):
     mouse = pygame.mouse.get_pos()
@@ -49,33 +73,51 @@ def check_button_click(image, x, y):
 
 #Clock for FPS control
 clock = pygame.time.Clock()
+frame_index = 0
+frame_duration = 100
+
+frame_timer = 0
+frame_delay = 100
+scale_factor = height/500 + 2
 
 current_screen = "menu"
 
 #Main Game Loop
 running = True
 while running:
-    screen.fill((0,0,0))
-    screen.blit(background, (0, 0))
+    screen.fill((226, 179, 209))
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
         elif event.type == pygame.VIDEORESIZE:
             width, height = event.w, event.h
             screen = pygame.display.set_mode((width, height), pygame.RESIZABLE)
-        background = update_background((width, height))
-        screen.blit(background, (0,0))
+        screen.fill((226, 179, 209))
 
-        #Game menu screen's element
-        gamename_pos = (width // 2 - gamename.get_width() // 2, height // 8)
-        gamename = game_name((width*0.63, height*0.26))
-        start_button_pos = (width // 2 - start_button.get_width() // 2, height // 2 - 50)
-        quit_button_pos = (width // 2 - quit_button.get_width() // 2, height // 2 + 40)
-
-        #Game's name image
-        screen.blit(gamename, gamename_pos)
-
+        #Game menu ... 40% (add gif)
         if current_screen == "menu":
+            #Game menu screen's element
+            gamename_pos = (width // 2.8 - gamename.get_width() // 2, height // 20)
+            gamename = game_name((width*0.63, height*0.26))
+            start_button_pos = (width // 5 - start_button.get_width() // 3, height // 2 - height/15)
+            start_button = started((width*0.25, height*0.15))
+            quit_button_pos = (width // 5 - quit_button.get_width() // 3, height // 2 + height/8)
+            quit_button = quited((width*0.25, height*0.15))
+
+            #Game's name image
+            screen.blit(gamename, gamename_pos)
+
+            frames = gifgen('./assets/menu/cat-gif-menu.gif', scale_factor)
+
+            if frames:
+                frame_timer += clock.get_time()  # 
+                if frame_timer >= frame_delay:
+                    frame_index = (frame_index + 1) % len(frames)
+                    frame_timer = 0
+
+                frame = frames[frame_index]
+                screen.blit(frame, (width*0.4 - 200,height - 490))
+
             #Start button
             screen.blit(start_button, start_button_pos)
             if check_button_click(start_button, *start_button_pos):
@@ -88,7 +130,7 @@ while running:
 
         #Quit comfirm window
         elif current_screen == "confirm":
-            screen.fill((0,0,0))
+            screen.fill((226, 179, 209))
             confirm_page = pygame.image.load("./assets/menu/confirm.png")
 
             #Adjust confirm window
@@ -121,7 +163,7 @@ while running:
 
         #Select level window
         elif current_screen == "level":
-            screen.fill((0,0,0))
+            screen.fill((226, 179, 209))
             levelground = pygame.image.load("./assets/cat-backgound resource/cat-background (9).png")
 
             #Adjust select level background image
@@ -188,7 +230,7 @@ while running:
                 current_screen = "hard mode"
 
         elif current_screen == "back menu":
-            screen.fill((0,0,0))
+            screen.fill((226, 179, 209))
             quit_level_page = pygame.image.load("./assets/quit/quit level.png")
 
             #Adjust confirm window
@@ -219,7 +261,7 @@ while running:
 
         #Child play mode window
         elif current_screen == "child play":
-            screen.fill((0,0,0))
+            screen.fill((226, 179, 209))
             childground = pygame.image.load("./assets/child play/Child Play.jpg")
 
             #Adjust select level background image
@@ -236,7 +278,7 @@ while running:
 
         #Easy mode window
         elif current_screen == "easy mode":
-            screen.fill((0,0,0))
+            screen.fill((226, 179, 209))
             easyground = pygame.image.load("./assets/easy mode/Easy.gif")
 
             #Adjust select level background image
@@ -253,7 +295,7 @@ while running:
 
         #Medium mode window
         elif current_screen == "medium mode":
-            screen.fill((0,0,0))
+            screen.fill((226, 179, 209))
             mediumground = pygame.image.load("./assets/medium mode/Medium.jpg")
 
             #Adjust select level background image
@@ -270,7 +312,7 @@ while running:
 
         #Hard mode window
         elif current_screen == "hard mode":
-            screen.fill((0,0,0))
+            screen.fill((226, 179, 209))
             hardground = pygame.image.load("./assets/hard mode/Hard.jpg")
 
             #Adjust select level background image
@@ -286,7 +328,7 @@ while running:
                 period_screen = "hard mode"
 
         elif current_screen == "quit level":
-            screen.fill((0,0,0))
+            screen.fill((226, 179, 209))
             quit_level_page = pygame.image.load("./assets/quit/quit level.png")
 
             #Adjust confirm window
