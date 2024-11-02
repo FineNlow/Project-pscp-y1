@@ -65,7 +65,6 @@ frame_duration = 100
 
 frame_timer = 0
 frame_delay = 100
-scale_factor = height/500 + 2
 
 current_screen = "menu"
 
@@ -83,9 +82,17 @@ while running:
 
         #Game menu ... 40% (add gif)
         if current_screen == "menu":
-            levelground = pygame.image.load("./assets/menu/cat-background.png")
-            levelground = pygame.transform.scale(levelground,(width, height))
-            screen.blit(levelground, (0,0))
+            scale_factor = 2
+            frames = gifgen('./assets/menu/background.gif', scale_factor)
+
+            if frames:
+                frame_timer += clock.get_time()  # 
+                if frame_timer >= frame_delay:
+                    frame_index = (frame_index + 1) % len(frames)
+                    frame_timer = 0
+
+                frame = frames[frame_index]
+                screen.blit(frame,  (0,0))
 
             #Game menu screen's element
             gamename_pos = (width // 2.8 - gamename.get_width() // 2, height // 20)
@@ -98,6 +105,7 @@ while running:
             #Game's name image
             screen.blit(gamename, gamename_pos)
 
+            scale_factor = height/500 + 2
             frames = gifgen('./assets/menu/cat-gif-menu.gif', scale_factor)
 
             if frames:
