@@ -5,7 +5,6 @@ import os
 
 #game screen .. 100%
 pygame.init()
-pygame.mixer.init()
 width, height = 800, 600
 screen = pygame.display.set_mode((width, height), pygame.RESIZABLE)
 
@@ -92,13 +91,10 @@ scale_factor = height/500 + 2
 
 current_screen = "menu"
 
+pygame.mixer.init()
 # Load the music file
-pygame.mixer.music.load("music.mp3")
-
-# Set volume (optional)
-pygame.mixer.music.set_volume(0.5)  # Volume is between 0.0 and 1.0
-
-# Play the music (loops=-1 makes it loop indefinitely)
+pygame.mixer.music.load("./assets/music/music.mp3") 
+pygame.mixer.music.set_volume(0.5)  
 pygame.mixer.music.play(loops=-1)
 
 #Main Game Loop ... ??%
@@ -263,19 +259,33 @@ while running:
 
             if check_button_click(credits_button, *credits_button_pos):
                 current_screen = "credits"
-
+            
+            # Load the "How to play" image
+            how_to_play_image = pygame.image.load("./assets/howtoplay/HOWTOPLAY.png").convert_alpha()  # Adjust the path as needed
+        
+            # Scale the "How to play" image
+            def scale_how_to_play_image(size):
+                return pygame.transform.scale(how_to_play_image, size)   
+            
+        
         #Tutorial ...10% (สอนวิธีเล่น)
         elif current_screen == "How to play":
             screen.fill((226, 179, 209))
 
+            # Scale and display the "How to play" image
+            scaled_how_to_play_image = scale_how_to_play_image((width * 0.8, height * 0.8))  # Adjust size as needed
+            how_to_play_rect = scaled_how_to_play_image.get_rect(center=(width // 2, height // 2))
+            screen.blit(scaled_how_to_play_image, how_to_play_rect)
+
+            # Add the back button
             back_button = pygame.image.load("./assets/setting/goback.png").convert_alpha()
             back_button = pygame.transform.scale(back_button, (40, 30))
-            back_button_pos = (width // 50 - setting_menu_tab.get_width() // 400, height // height + (height*0.03))
+            back_button_pos = (width // 50 - setting_menu_tab.get_width() // 400, height // height + (height * 0.03))
             screen.blit(back_button, back_button_pos)
 
             if check_button_click(back_button, *back_button_pos):
                 current_screen = "setting menu"
-
+       
         #Credits ...10% (ใส่เครดิต)
         elif current_screen == "credits":
             screen.fill((226, 179, 209))
