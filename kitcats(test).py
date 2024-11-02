@@ -1,5 +1,6 @@
 import pygame, sys
 from PIL import Image
+import time
 
 #game screen .. 100%
 pygame.init()
@@ -23,11 +24,7 @@ close_tab = pygame.image.load("./assets/yes no btn/x.png").convert_alpha()
 close_tab = pygame.transform.scale(close_tab, (45,45))
 close_tab_pos = (width // (height-(height*9.5)) + close_tab.get_width() // width, height // height**0.8)
 
-mute_set = pygame.image.load("./assets/setting/mute.png").convert_alpha()
-mute_set = pygame.transform.scale(mute_set, (100, 100))
-nosound, nosong = True, True
-
-setting_button = pygame.image.load("./assets/setting/setting.png").convert_alpha()
+pause_button = pygame.image.load("./assets/setting/setting (1).png").convert_alpha()
 
 #convert gif to show frame by frame ... 20%
 def gifgen(gif_path, scale_factor):
@@ -49,21 +46,33 @@ def gifgen(gif_path, scale_factor):
     return frames
 
 #Check button click
+last_click_time = 0
+click_delay = 0.25
+
 def check_button_click(image, x, y):
+    global last_click_time
     mouse = pygame.mouse.get_pos()
     click = pygame.mouse.get_pressed()
     
     rect = image.get_rect(topleft=(x, y))
 
     if rect.collidepoint(mouse):
-        if click[0] == 1:
+        current_time = time.time()
+        if click[0] == 1 and (current_time - last_click_time) > click_delay:
+            last_click_time = current_time
             return True
     return False
 
-#Background Music
-pygame.mixer.music.load("./assets/music/music.mp3")
-pygame.mixer.music.set_volume(0.5)  # Volume is between 0.0 and 1.0
+pygame.mixer.init()
+# Load the music file
+pygame.mixer.music.load("./assets/music/music.mp3") 
+pygame.mixer.music.set_volume(0.2)
 pygame.mixer.music.play(loops=-1)
+
+mute_set = pygame.image.load("./assets/setting/mute.png").convert_alpha()
+mute_set = pygame.transform.scale(mute_set, (100, 100))
+nosound, nosong = True, True
+mute_icon_displayed = False
 
 #Clock for FPS control
 clock = pygame.time.Clock()
@@ -125,6 +134,7 @@ while running:
             #Quit button
             screen.blit(quit_button, quit_button_pos)
             if check_button_click(quit_button, *quit_button_pos):
+                period_screen = "menu"
                 current_screen = "confirm"
 
             #Setting button
@@ -157,12 +167,15 @@ while running:
 
             #Click confirm button
             if check_button_click(yes_confirm, *yes_confirm_pos):
-                pygame.quit()
-                sys.exit()
+                if period_screen == "pause":
+                    current_screen = "menu"
+                else:
+                    pygame.quit()
+                    sys.exit()
 
             #Click back to menu
             if check_button_click(not_confirm, *not_confirm_pos):
-                current_screen = "menu"
+                current_screen = period_screen
 
         #setting menu ...65% (elementครบ เหลือmute sound & song, หน้า tutorial & credits)
         if current_screen == "setting menu":
@@ -177,7 +190,7 @@ while running:
             frames = gifgen('./assets/menu/cat-gif (1).gif', scale_factor)
 
             if frames:
-                frame_timer += clock.get_time()  # 
+                frame_timer += clock.get_time()
                 if frame_timer >= frame_delay:
                     frame_index = (frame_index + 1) % len(frames)
                     frame_timer = 0
@@ -186,12 +199,13 @@ while running:
                 frame_rect = setting_menu_tab.get_rect(center=(width + (width//10), height // 2.2))
                 screen.blit(frame, frame_rect)
 
-            #button in setting tab
+            # Button in setting tab for mute/unmute sound
             speaker_button = pygame.image.load("./assets/setting/speaker.png").convert_alpha()
             speaker_button = pygame.transform.scale(speaker_button, (100, 100))
             speaker_button_pos = ((width // 2.2 - setting_menu_tab.get_width() // 400) - height//4, height // height + (height*0.36))
             screen.blit(speaker_button, speaker_button_pos)
 
+            # Button in setting tab for mute/unmute music
             song_button = pygame.image.load("./assets/setting/song.png").convert_alpha()
             song_button = pygame.transform.scale(song_button, (100, 100))
             song_button_pos = (width // 2.2 - setting_menu_tab.get_width() // 400, height // height + (height*0.36))
@@ -225,8 +239,10 @@ while running:
                 # print("Music On") > Music always on
 
             if not nosong:
+                pygame.mixer.music.pause() # Stop the music if muted
                 screen.blit(mute_set, song_button_pos)
-                #mute overall song
+            else:
+                pygame.mixer.music.unpause()
 
             if check_button_click(howto_button, *howto_button_pos):
                 period_screen = "setting menu"
@@ -240,10 +256,23 @@ while running:
                 period_screen = "setting menu"
                 current_screen = "credits"
 
+            # Load the "How to play" image
+            how_to_play_image = pygame.image.load("./assets/howtoplay/HOWTOPLAY.png").convert_alpha()  # Adjust the path as needed
+
+            # Scale the "How to play" image
+            def scale_how_to_play_image(size):
+                return pygame.transform.scale(how_to_play_image, size)
+
         #Tutorial ...10% (สอนวิธีเล่น)
         elif current_screen == "How to play":
             screen.fill((226, 179, 209))
 
+            # Scale and display the "How to play" image
+            scaled_how_to_play_image = scale_how_to_play_image((width * 0.8, height * 0.8))  # Adjust size as needed
+            how_to_play_rect = scaled_how_to_play_image.get_rect(center=(width // 2, height // 2))
+            screen.blit(scaled_how_to_play_image, how_to_play_rect)
+
+            # Add the back button
             back_button = pygame.image.load("./assets/setting/goback.png").convert_alpha()
             back_button = pygame.transform.scale(back_button, (40, 30))
             back_button_pos = (20, height // height + (height*0.03))
@@ -255,6 +284,12 @@ while running:
         #Credits ...10% (ใส่เครดิต)
         elif current_screen == "credits":
             screen.fill((226, 179, 209))
+
+            # Load credits image or create a credits text
+            credits_image = pygame.image.load("./assets/credits/creditsname.png").convert_alpha()  # Load your credits image
+            credits_image = pygame.transform.scale(credits_image, (width * 0.8, height * 0.8))  # Scale if necessary
+            credits_rect = credits_image.get_rect(center=(width // 2, height // 2))
+            screen.blit(credits_image, credits_rect)
 
             back_button = pygame.image.load("./assets/setting/goback.png").convert_alpha()
             back_button = pygame.transform.scale(back_button, (40, 30))
@@ -331,41 +366,25 @@ while running:
         #Easy mode window
         elif current_screen == "easy mode":
             screen.fill((226, 179, 209))
-            easyground = pygame.image.load("./assets/easy mode/Easy.gif").convert_alpha()
-
-            #Adjust select level background image
-            def update_background(size):
-                return pygame.transform.scale(easyground, size)
-
-            easyground = update_background((width, height))
-            screen.blit(easyground, (0,0))
 
             #Setting button
-            setting_button = pygame.transform.scale(setting_button, (41,38))
-            setting_button_pos = (width - width*0.0625, height - height*0.96)
+            pause_button = pygame.transform.scale(pause_button, (41,38))
+            pause_button_pos = (width - width*0.0625, height - height*0.98)
 
-            screen.blit(setting_button,setting_button_pos)
-            if check_button_click(setting_button, *setting_button_pos):
+            screen.blit(pause_button,pause_button_pos)
+            if check_button_click(pause_button, *pause_button_pos):
                 current_screen = "pause"
 
         #Medium mode window
         elif current_screen == "normal mode":
             screen.fill((226, 179, 209))
-            normalground = pygame.image.load("./assets/normal mode/normal.jpg").convert_alpha()
-
-            #Adjust select level background image
-            def update_background(size):
-                return pygame.transform.scale(normalground, size)
-
-            normalground = update_background((width, height))
-            screen.blit(normalground, (0,0))
 
             #Setting button
-            setting_button = pygame.transform.scale(setting_button, (41,38))
-            setting_button_pos = (width - width*0.0625, height - height*0.96)
+            pause_button = pygame.transform.scale(pause_button, (41,38))
+            pause_button_pos = (width - width*0.0625, height - height*0.98)
 
-            screen.blit(setting_button,setting_button_pos)
-            if check_button_click(setting_button, *setting_button_pos):
+            screen.blit(pause_button,pause_button_pos)
+            if check_button_click(pause_button, *pause_button_pos):
                 current_screen = "pause"
 
         #Hard mode window
@@ -373,19 +392,12 @@ while running:
             screen.fill((226, 179, 209))
             hardground = pygame.image.load("./assets/hard mode/Hard.jpg").convert_alpha()
 
-            #Adjust select level background image
-            def update_background(size):
-                return pygame.transform.scale(hardground, size)
-
-            hardground = update_background((width, height))
-            screen.blit(hardground, (0,0))
-
             #Setting button
-            setting_button = pygame.transform.scale(setting_button, (41,38))
-            setting_button_pos = (width - width*0.0625, height - height*0.96)
+            pause_button = pygame.transform.scale(pause_button, (41,38))
+            pause_button_pos = (width - width*0.0625, height - height*0.98)
 
-            screen.blit(setting_button,setting_button_pos)
-            if check_button_click(setting_button, *setting_button_pos):
+            screen.blit(pause_button,pause_button_pos)
+            if check_button_click(pause_button, *pause_button_pos):
                 current_screen = "pause"
 
         if current_screen == "pause":
@@ -448,20 +460,22 @@ while running:
                 # print("Music On") > Music always on
 
             if not nosong:
+                pygame.mixer.music.pause() # Stop the music if muted
                 screen.blit(mute_set, song_button_pos)
-                #mute overall song
+            else:
+                pygame.mixer.music.unpause()
 
             if check_button_click(howto_button, *howto_button_pos):
                 period_screen = "pause"
                 current_screen = "How to play"
 
             if check_button_click(back_button, *back_button_pos):
-                current_screen = "menu"
+                current_screen = "level"
                 scale_factor = height/500 + 2
 
             if check_button_click(home_button, *home_button_pos):
                 period_screen = "pause"
-                current_screen = "menu"
+                current_screen = "confirm"
 
         pygame.display.flip()
         clock.tick(60) #FPS fixed
