@@ -6,7 +6,7 @@ import time
 pygame.init()
 
 # Screen settings
-WIDTH, HEIGHT = 1440, 1024
+WIDTH, HEIGHT = 800, 600
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Math Game")
 
@@ -23,18 +23,18 @@ DARK_GRAY = (40, 40, 40)
 font = pygame.font.Font(None, 36)
 
 # Game variables
-score = 0
 remains_target = 5  # Total questions to solve to win
 problem_limit = 10  # Maximum problems allowed before losing
 default_timer = 30  # Default timer for each question in seconds
 timer = default_timer
-time_decrease_factor = 2 / 5  # Time reduction factor for wrong answer
+time_decrease_factor = 0.5 / 5  # Time reduction factor for wrong answer
 current_time = time.time()
 questions = []
 selected_question = None
 operations = ['+', '-', '*', '/']
 remains_done = 0  # Counter for questions answered correctly
 problem_count = 0  # Counter for total problems generated
+
 
 # Generate random question
 def generate_question():
@@ -71,10 +71,6 @@ def end_game(message):
 for _ in range(3):
     add_question()
 
-# Define choice dimensions at the start of the game loop
-choice_width, choice_height = 120, 50  # Width and height of choice buttons
-choice_y = HEIGHT - 200  # Y position to display choices
-
 # Main game loop
 running = True
 clock = pygame.time.Clock()
@@ -85,7 +81,7 @@ while running:
     # Calculate remaining time for the current question
     elapsed_time = time.time() - current_time
     remaining_time = max(0, int(timer - elapsed_time))
-    timer = remaining_time * time_decrease_factor  # ลดเวลาลงเหลือ 2/5 ของเวลาที่เหลืออยู่
+
     # Check timer for adding questions
     if remaining_time <= 0:
         add_question()
@@ -109,6 +105,8 @@ while running:
     # Display choices for the selected question
     if selected_question is not None:
         question_text, choices, correct_choice = questions[selected_question]
+        choice_width, choice_height = 120, 50  # Width and height of choice buttons
+        choice_y = HEIGHT - 200  # Y position to display choices
 
         # Display the choices at the center of the screen horizontally
         for i, choice in enumerate(choices):
@@ -123,10 +121,14 @@ while running:
     # Display remaining time for the current question
     timer_text = font.render(f"Time: {remaining_time}s", True, WHITE)
     screen.blit(timer_text, (WIDTH // 2 - timer_text.get_width() // 2, 20))
+    # กำหนดขนาดของปุ่มคำตอบ
+    choice_width, choice_height = 120, 50  # Width and height of choice buttons
 
     # Event handling
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
+            running = False
+        elif problem_limit == problem_count:
             running = False
         elif event.type == pygame.MOUSEBUTTONDOWN:
             mouse_x, mouse_y = pygame.mouse.get_pos()
@@ -134,29 +136,26 @@ while running:
             for i, (question_text, _, _) in enumerate(questions):
                 if 50 < mouse_x < 300 and 100 + i * 40 < mouse_y < 140 + i * 40:
                     selected_question = i
-        if selected_question is not None:
-            question_text, choices, correct_choice = questions[selected_question]
-            for i in range(4):
-                choice_x = WIDTH // 2 - (2 * choice_width) + i * (choice_width + 10)
-                if choice_x < mouse_x < choice_x + choice_width and choice_y < mouse_y < choice_y + choice_height:
-                    if i == correct_choice:
-                        score += 100
-                        remains_done += 1
-                        questions.pop(selected_question)
-                        selected_question = None
-                        if remains_done == remains_target:
-                            end_game("ยินดีด้วย! คุณชนะแล้ว!")
-                        elif len(questions) < remains_target:  # Add new question if needed
-                            add_question()
-                            current_time = time.time()  # Reset current time
-                    else:
-                        timer = remaining_time * time_decrease_factor  # ลดเวลาลงเหลือ 2/5 ของเวลาที่เหลืออยู่
-                        current_time = time.time()  # Reset timer start time
-                    break
-
-    # Display score
-    score_text = font.render(f"Score: {score}", True, WHITE)
-    screen.blit(score_text, (10, HEIGHT - 40))
+            # Check if a choice for the selected question is clicked
+            if selected_question is not None:
+                question_text, choices, correct_choice = questions[selected_question]
+                for i in range(4):
+                    choice_x = WIDTH // 2 - (2 * choice_width) + i * (choice_width + 10)
+                    if choice_x < mouse_x < choice_x + choice_width and choice_y < mouse_y < choice_y + choice_height:
+                        if i == correct_choice:
+                            remains_done += 1
+                            questions.pop(selected_question)
+                            selected_question = None
+                            if remains_done == remains_target:
+                                end_game("1")
+                            elif len(questions) < remains_target:  # Add new question if needed
+                                add_question()
+                                current_time = time.time()  # Reset current time
+                        else:
+                            # Apply time reduction for a wrong answer
+                            timer = max(1, time_decrease_factor)  # Reduce timer to 0.5 /5
+                            current_time = time.time()  # Reset timer start time
+                        break
 
     pygame.display.flip()
     clock.tick(60)
