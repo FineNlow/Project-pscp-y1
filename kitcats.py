@@ -2,8 +2,10 @@ import pygame, sys
 from PIL import Image
 import os
 
+
 #game screen .. 100%
 pygame.init()
+pygame.mixer.init()
 width, height = 800, 600
 screen = pygame.display.set_mode((width, height), pygame.RESIZABLE)
 
@@ -89,6 +91,15 @@ frame_delay = 100
 scale_factor = height/500 + 2
 
 current_screen = "menu"
+
+# Load the music file
+pygame.mixer.music.load("music.mp3")
+
+# Set volume (optional)
+pygame.mixer.music.set_volume(0.5)  # Volume is between 0.0 and 1.0
+
+# Play the music (loops=-1 makes it loop indefinitely)
+pygame.mixer.music.play(loops=-1)
 
 #Main Game Loop ... ??%
 running = True
