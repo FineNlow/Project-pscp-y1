@@ -67,6 +67,7 @@ def quited(size):
 mute_set = pygame.image.load("./assets/setting/mute.png").convert_alpha()
 mute_set = pygame.transform.scale(mute_set, (100, 100))
 nosound, nosong = True, True
+mute_icon_displayed = False
 
 #Check button click
 def check_button_click(image, x, y):
@@ -94,7 +95,7 @@ current_screen = "menu"
 pygame.mixer.init()
 # Load the music file
 pygame.mixer.music.load("./assets/music/music.mp3") 
-pygame.mixer.music.set_volume(0.5)  
+pygame.mixer.music.set_volume(0.2)  
 pygame.mixer.music.play(loops=-1)
 
 #Main Game Loop ... ??%
@@ -208,12 +209,13 @@ while running:
                 frame_rect = setting_menu_tab.get_rect(center=(width + (width//10), height // 2.2))
                 screen.blit(frame, frame_rect)
 
-            #button in setting tab
+            # Button in setting tab for mute/unmute sound
             speaker_button = pygame.image.load("./assets/setting/speaker.png").convert_alpha()
             speaker_button = pygame.transform.scale(speaker_button, (100, 100))
             speaker_button_pos = ((width // 2.2 - setting_menu_tab.get_width() // 400) - height//4, height // height + (height*0.36))
             screen.blit(speaker_button, speaker_button_pos)
 
+            # Button in setting tab for mute/unmute music
             song_button = pygame.image.load("./assets/setting/song.png").convert_alpha()
             song_button = pygame.transform.scale(song_button, (100, 100))
             song_button_pos = (width // 2.2 - setting_menu_tab.get_width() // 400, height // height + (height*0.36))
@@ -244,11 +246,10 @@ while running:
 
             if check_button_click(song_button, *song_button_pos):
                 nosong = not nosong
-                # print("Music On") > Music always on
-
-            if not nosong:
-                screen.blit(mute_set, song_button_pos)
-                #mute overall song
+                if nosong:
+                    pygame.mixer.music.pause()  # Stop the music if muted
+                else:
+                    pygame.mixer.music.unpause()  # Play music again if unmuted
 
             if check_button_click(howto_button, *howto_button_pos):
                 current_screen = "How to play"
@@ -289,6 +290,12 @@ while running:
         #Credits ...10% (ใส่เครดิต)
         elif current_screen == "credits":
             screen.fill((226, 179, 209))
+
+            # Load credits image or create a credits text
+            credits_image = pygame.image.load("./assets/credits/creditsname.png").convert_alpha()  # Load your credits image
+            credits_image = pygame.transform.scale(credits_image, (width * 0.8, height * 0.8))  # Scale if necessary
+            credits_rect = credits_image.get_rect(center=(width // 2, height // 2))
+            screen.blit(credits_image, credits_rect)
 
             back_button = pygame.image.load("./assets/setting/goback.png").convert_alpha()
             back_button = pygame.transform.scale(back_button, (40, 30))
