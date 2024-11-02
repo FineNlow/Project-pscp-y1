@@ -8,7 +8,7 @@ pygame.init()
 # Screen settings
 WIDTH, HEIGHT = 1024, 768
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Math Game")
+pygame.display.set_caption("KITCATS")
 
 # Colors
 WHITE = (255, 255, 255)
@@ -34,9 +34,9 @@ operations = ['+', '-', '*', '/']
 remains_done = 0  # Counter for questions answered correctly
 problem_count = 0  # Counter for total problems generated
 
-
 # Generate random question
 def generate_question():
+    num = [random.randint(1,10) for _ in range(random.randint(1,4))]
     num1 = random.randint(1, 10)
     num2 = random.randint(1, 10)
     op = random.choice(operations)
@@ -125,9 +125,7 @@ while running:
 
     # Event handling
     for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-        elif problem_limit == problem_count:
+        if event.type == pygame.QUIT or problem_limit == problem_count:
             running = False
         elif event.type == pygame.MOUSEBUTTONDOWN:
             mouse_x, mouse_y = pygame.mouse.get_pos()
@@ -143,6 +141,7 @@ while running:
                     if choice_x < mouse_x < choice_x + choice_width and choice_y < mouse_y < choice_y + choice_height:
                         if i == correct_choice:
                             remains_done += 1
+                            problem_count -= 1
                             questions.pop(selected_question)
                             selected_question = None
                             if remains_done == remains_target:
@@ -157,6 +156,6 @@ while running:
                         break
 
     pygame.display.flip()
-    clock.tick(60)
+    clock.tick(144)
 
 pygame.quit()
