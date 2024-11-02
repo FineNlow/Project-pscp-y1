@@ -246,10 +246,12 @@ while running:
 
             if check_button_click(song_button, *song_button_pos):
                 nosong = not nosong
-                if nosong:
-                    pygame.mixer.music.pause()  # Stop the music if muted
-                else:
-                    pygame.mixer.music.unpause()  # Play music again if unmuted
+            if not nosong:
+                pygame.mixer.music.pause()  # Stop the music if muted
+                screen.blit(mute_set, song_button_pos)
+            else:
+                pygame.mixer.music.unpause()  # Play music again if unmuted
+
 
             if check_button_click(howto_button, *howto_button_pos):
                 current_screen = "How to play"
@@ -269,7 +271,7 @@ while running:
                 return pygame.transform.scale(how_to_play_image, size)   
             
         
-        #Tutorial ...10% (สอนวิธีเล่น)
+        #Tutorial ...80% (สอนวิธีเล่น)
         elif current_screen == "How to play":
             screen.fill((226, 179, 209))
 
