@@ -1,4 +1,5 @@
 import pygame, sys
+from PIL import Image
 
 pygame.init()
 width, height = 1440, 1024
