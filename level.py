@@ -6,7 +6,7 @@ import time
 pygame.init()
 
 # Screen settings
-WIDTH, HEIGHT = 800, 600
+WIDTH, HEIGHT = 1024, 768
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Math Game")
 
@@ -27,7 +27,6 @@ remains_target = 5  # Total questions to solve to win
 problem_limit = 10  # Maximum problems allowed before losing
 default_timer = 30  # Default timer for each question in seconds
 timer = default_timer
-time_decrease_factor = 0.5 / 5  # Time reduction factor for wrong answer
 current_time = time.time()
 questions = []
 selected_question = None
@@ -153,7 +152,7 @@ while running:
                                 current_time = time.time()  # Reset current time
                         else:
                             # Apply time reduction for a wrong answer
-                            timer = max(1, time_decrease_factor)  # Reduce timer to 0.5 /5
+                            timer = max(1, (0.5 / remaining_time) * remaining_time)  # Reduce timer to 0.5 / remain 
                             current_time = time.time()  # Reset timer start time
                         break
 
