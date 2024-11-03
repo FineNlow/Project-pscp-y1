@@ -67,7 +67,8 @@ def quited(size):
 mute_set = pygame.image.load("./assets/setting/mute.png").convert_alpha()
 mute_set = pygame.transform.scale(mute_set, (100, 100))
 nosound, nosong = True, True
-mute_icon_displayed = False
+
+
 
 #Check button click
 def check_button_click(image, x, y):
