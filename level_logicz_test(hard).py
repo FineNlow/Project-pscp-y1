@@ -8,7 +8,7 @@ pygame.init()
 # Screen settings
 WIDTH, HEIGHT = 1024, 768
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("KITCATS-MEDIUM")
+pygame.display.set_caption("KITCATS-HARD")
 
 # Colors
 WHITE = (255, 255, 255)
@@ -23,14 +23,14 @@ DARK_GRAY = (40, 40, 40)
 font = pygame.font.Font(None, 36)
 
 # Game variables
-remains_target = 12  # Total questions to solve to win
-problem_limit = 20  # Maximum problems allowed before losing
-default_timer = 60  # Default timer for each question in seconds
+remains_target = 20  # Total questions to solve to win
+problem_limit = 30  # Maximum problems allowed before losing
+default_timer = 100  # Default timer for each question in seconds
 timer = default_timer
 current_time = time.time()
 questions = []
 selected_question = None
-operations = ['+', '-', '*', '/']
+operations = ['+', '-', '*', '/','**']
 remains_done = 0  # Counter for questions answered correctly
 problem_count = 0  # Counter for total problems generated
 
@@ -38,9 +38,9 @@ problem_count = 0  # Counter for total problems generated
 
 
 
-# Generate question and parentheses
+# Generate random question with 2 to 5 numbers
 def generate_question():
-    num_count = random.randint(2, 4)  # Randomly select number of terms between 2 and 4
+    num_count = random.randint(2, 5)  # Randomly select number of terms between 2 and 5
     numbers = [random.randint(1, 100) for _ in range(num_count)]  # Generate random numbers
     ops = [random.choice(operations) for _ in range(num_count - 1)]  # Generate random operators
     
@@ -77,10 +77,20 @@ def add_question():
     global selected_question, timer, problem_count
     if len(questions) < problem_limit:
         question_text, answer = generate_question()
-        # Generate choices
-        choices = [answer + random.randint(-10, 10) for _ in range(3)]
+
+        # Generate unique choices
+        choices = set()
+        while len(choices) < 3:
+            choice = answer + random.randint(-10, 10)
+            # Ensure choice is unique and not equal to the answer
+            if choice != answer and choice not in choices:
+                choices.add(choice)
+
+        # Add the correct answer and shuffle choices
+        choices = list(choices)
         choices.append(answer)
         random.shuffle(choices)
+        
         questions.append((question_text, choices, choices.index(answer)))
         problem_count += 1  # Increment problem count
         timer = default_timer  # Reset timer to default when a new question is added
@@ -118,7 +128,7 @@ while running:
         current_time = time.time()
 
     # Display UI elements
-    difficulty_text = font.render("DIFFICULTY: MEDIUM", True, YELLOW)
+    difficulty_text = font.render("DIFFICULTY: HARD", True, RED)
     screen.blit(difficulty_text, (20, 20))
 
     # Display remains done and problem count in real-time
@@ -183,7 +193,7 @@ while running:
                         else:
                             # Reduce timer to 5% of the remaining time
                             current_remaining = timer - (time.time() - current_time)
-                            timer = max(1, current_remaining * 0.25)  # Reduce to 75% of current remaining time
+                            timer = max(1, current_remaining * 0.2)  # Reduce to 80% of current remaining time
                             current_time = time.time()  # Reset timer start time
                         break
 

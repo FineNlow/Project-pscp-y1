@@ -8,7 +8,7 @@ pygame.init()
 # Screen settings
 WIDTH, HEIGHT = 1024, 768
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("KITCATS")
+pygame.display.set_caption("KITCATS-EASY")
 
 # Colors
 WHITE = (255, 255, 255)
@@ -34,10 +34,14 @@ operations = ['+', '-']
 remains_done = 0  # Counter for questions answered correctly
 problem_count = 0  # Counter for total problems generated
 
+# -------Logic-------
+
+
+
 # Generate random question
 def generate_question():
-    num1 = random.randint(1, 20)
-    num2 = random.randint(1, 20)
+    num1 = random.randint(1, 250)
+    num2 = random.randint(1, 250)
     op = random.choice(operations)
     answer = eval(f"{num1} {op} {num2}")
     return f"{num1} {op} {num2}", answer
@@ -55,19 +59,25 @@ def add_question():
         problem_count += 1  # Increment problem count
         timer = default_timer  # Reset timer to default when a new question is added
 
+
+
 # End game with message
 def end_game(message):
     print(message)
     pygame.quit()
     exit()
 
-# Add initial questions
+# Add 3 questions when game start
 for _ in range(3):
     add_question()
 
 # Main game loop
 running = True
 clock = pygame.time.Clock()
+
+# -------Interface for testing-------
+
+
 
 while running:
     screen.fill(DARK_GRAY)
@@ -150,6 +160,8 @@ while running:
                             timer = max(1, current_remaining * 0.91)  # Reduce to 0.9% of current remaining time
                             current_time = time.time()  # Reset timer start time
                         break
+
+
 
     pygame.display.flip()
     clock.tick(144)
