@@ -99,6 +99,21 @@ pygame.mixer.music.load("./assets/music/music.mp3")
 pygame.mixer.music.set_volume(0.2)  
 pygame.mixer.music.play(loops=-1)
 
+# Load click sound effect
+click_sound = pygame.mixer.Sound("./assets/sounds/mouse-click-sound-233951.wav")
+
+# Function to check button click
+def check_button_click(image, x, y):
+    mouse = pygame.mouse.get_pos()
+    click = pygame.mouse.get_pressed()
+    
+    rect = image.get_rect(topleft=(x, y))
+
+    if rect.collidepoint(mouse) and click[0] == 1:
+        click_sound.play()  # Play the click sound
+        return True
+    return False
+
 #Main Game Loop ... ??%
 running = True
 while running:
