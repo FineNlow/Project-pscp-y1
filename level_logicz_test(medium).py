@@ -23,9 +23,9 @@ DARK_GRAY = (40, 40, 40)
 font = pygame.font.Font(None, 36)
 
 # Game variables
-remains_target = 5  # Total questions to solve to win
-problem_limit = 10  # Maximum problems allowed before losing
-default_timer = 30  # Default timer for each question in seconds
+remains_target = 12  # Total questions to solve to win
+problem_limit = 15  # Maximum problems allowed before losing
+default_timer = 60  # Default timer for each question in seconds
 timer = default_timer
 current_time = time.time()
 questions = []
@@ -35,17 +35,24 @@ remains_done = 0  # Counter for questions answered correctly
 problem_count = 0  # Counter for total problems generated
 
 # Generate random question
+# Generate random question with 2 to 4 numbers
 def generate_question():
-    num = [random.randint(1,10) for _ in range(random.randint(1,4))]
-    num1 = random.randint(1, 10)
-    num2 = random.randint(1, 10)
-    op = random.choice(operations)
-    if op == '/':  # Avoid division by zero
-        num2 = random.randint(1, 9)
-        answer = num1 // num2
-    else:
-        answer = eval(f"{num1} {op} {num2}")
-    return f"{num1} {op} {num2}", answer
+    num_count = random.randint(2, 4)  # Randomly select number of terms between 2 and 4
+    numbers = [random.randint(1, 50) for _ in range(num_count)]  # Generate random numbers
+    ops = [random.choice(operations) for _ in range(num_count - 1)]  # Generate random operators
+    
+    # Build the equation string
+    question_text = f"{numbers[0]}"
+    for i in range(1, num_count):
+        question_text += f" {ops[i - 1]} {numbers[i]}"
+    
+    # Evaluate the answer safely
+    try:
+        answer = eval(question_text)
+    except ZeroDivisionError:
+        return generate_question()  # Regenerate if there's a division by zero
+    return question_text, int(answer)
+
 
 # Add new question to the questions list
 def add_question():
@@ -120,9 +127,7 @@ while running:
     # Display remaining time for the current question
     timer_text = font.render(f"Time: {remaining_time}s", True, WHITE)
     screen.blit(timer_text, (WIDTH // 2 - timer_text.get_width() // 2, 20))
-    # กำหนดขนาดของปุ่มคำตอบ
-    choice_width, choice_height = 120, 50  # Width and height of choice buttons
-
+    
     # Event handling
     for event in pygame.event.get():
         if event.type == pygame.QUIT or problem_limit == problem_count:
@@ -136,6 +141,8 @@ while running:
             # Check if a choice for the selected question is clicked
             if selected_question is not None:
                 question_text, choices, correct_choice = questions[selected_question]
+                choice_width, choice_height = 120, 50
+                choice_y = HEIGHT - 200
                 for i in range(4):
                     choice_x = WIDTH // 2 - (2 * choice_width) + i * (choice_width + 10)
                     if choice_x < mouse_x < choice_x + choice_width and choice_y < mouse_y < choice_y + choice_height:
@@ -150,8 +157,9 @@ while running:
                                 add_question()
                                 current_time = time.time()  # Reset current time
                         else:
-                            # Apply time reduction for a wrong answer
-                            timer = max(1, (0.5 / remaining_time) * remaining_time)  # Reduce timer to 0.5 / remain 
+                            # Reduce timer to 5% of the remaining time
+                            current_remaining = timer - (time.time() - current_time)
+                            timer = max(1, current_remaining * 0.25)  # Reduce to 75% of current remaining time
                             current_time = time.time()  # Reset timer start time
                         break
 
