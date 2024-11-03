@@ -12,8 +12,10 @@ screen = pygame.display.set_mode((width, height), pygame.RESIZABLE)
 
 #click sound
 click_sound = pygame.mixer.Sound("./assets/sounds/click.wav")
+click_sound.set_volume(0.2)
 #meow sound 
 meow_sound = pygame.mixer.Sound("./assets/sounds/meow.mp3")
+meow_sound.set_volume(0.2)
 #icon & name's bar ... 100%
 pygame.display.set_caption("KITCATS")
 icons = pygame.image.load("./assets/menu/cat-logo.png").convert_alpha()
@@ -259,7 +261,7 @@ while running:
         if check_button_click(speaker_button, *speaker_button_pos):
             nosound = not nosound
             # print("Sound Activated") > Sound always activated
-
+        #nosong
         if not nosound:
             screen.blit(mute_set, speaker_button_pos)
             # mute in-game sound
