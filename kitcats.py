@@ -83,6 +83,13 @@ frame_timer = 0
 frame_delay = 100
 scale_factor = height/500 + 2
 
+# Load your cursor image
+cursor_image = pygame.image.load("./assets/menu/cat-cursor.png").convert_alpha()
+cursor_image = pygame.transform.scale(cursor_image, (40, 35))
+cursor_width, cursor_height = cursor_image.get_size()
+cursor = pygame.cursors.Cursor((cursor_width // 2, cursor_height // 2), cursor_image)
+pygame.mouse.set_cursor(cursor)
+
 current_screen = "menu"
 
 #Main Game Loop
