@@ -380,6 +380,7 @@ while running:
 
         screen.blit(pause_button,pause_button_pos)
         if check_button_click(pause_button, *pause_button_pos):
+            period_screen = "easy mode"
             current_screen = "pause"
 
     #Medium mode window
@@ -392,6 +393,7 @@ while running:
 
         screen.blit(pause_button,pause_button_pos)
         if check_button_click(pause_button, *pause_button_pos):
+            period_screen = "normal mode"
             current_screen = "pause"
 
     #Hard mode window
@@ -405,6 +407,7 @@ while running:
 
         screen.blit(pause_button,pause_button_pos)
         if check_button_click(pause_button, *pause_button_pos):
+            period_screen = "hard mode"
             current_screen = "pause"
 
     if current_screen == "pause":
@@ -477,7 +480,7 @@ while running:
             current_screen = "How to play"
 
         if check_button_click(back_button, *back_button_pos):
-            current_screen = "level"
+            current_screen = period_screen
             scale_factor = height/500 + 2
 
         if check_button_click(home_button, *home_button_pos):
