@@ -2,6 +2,7 @@ import pygame
 import random
 import time
 import sys
+import os
 
 # Initialize pygame
 pygame.init()
@@ -9,7 +10,7 @@ pygame.init()
 # Screen settings
 WIDTH, HEIGHT = 1024, 768
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Math Game")
+pygame.display.set_caption("KITCATS")
 
 # Colors
 WHITE = (255, 255, 255)
@@ -22,9 +23,22 @@ DARK_GREEN = (0, 32, 0)
 BORDER_GREEN = (0, 255, 0)
 DARK_GRAY = (20, 20, 20)
 
-# Font settings
-font = pygame.font.Font(None, 36)
-pixel_font = pygame.font.Font(None, 24)  # Smaller font for pixel-style text
+# game elements
+BACKGROUND = pygame.image.load("./assets/img/level/Background/Hard.png")
+DIFFICULTY = pygame.image.load("./assets/img/level/Difficulty/DIFFICULTY _ Hard.png")
+COUNT_ZONE = pygame.image.load("./assets/img/level/User zone/Rectangle 9946.png")
+PROBLEM_BOX = pygame.image.load("./assets/img/level/User zone/Ploblem rec.png")
+PROBLEM_DISPLAY = pygame.image.load("./assets/img/level/User zone/Ploblem quiz.png")
+ANS_RED = pygame.image.load("./assets/img/level/Answer btn/red.png")
+ANS_BLUE = pygame.image.load("./assets/img/level/Answer btn/blue.png")
+ANS_GREEN = pygame.image.load("./assets/img/level/Answer btn/green.png")
+ANS_YELLOW = pygame.image.load("./assets/img/level/Answer btn/yellow.png")
+
+# Load Pixelify Sans font
+font_path = "./assets/font/PixelifySans-Regular.ttf"
+pixel_font = pygame.font.Font(font_path, 24)
+pixel_font_large = pygame.font.Font(font_path, 36)
+pixel_font_large = pygame.font.Font(None, 36)
 
 # Game variables
 remains_target = 5  # Total questions to solve to win
@@ -35,8 +49,6 @@ current_time = time.time()
 operations = ['+', '-', '*', '/']
 remains_done = 0  # Counter for questions answered correctly
 problem_count = 0  # Counter for total problems generated
-
-# Problem tracking
 problems = []  # List to store problem data including position
 current_problem = None  # Currently selected problem
 
@@ -49,10 +61,9 @@ class Problem:
         self.choices = self.generate_choices()
         self.timer = default_timer
         self.start_time = time.time()
-        self.is_expired = False  # Track if problem expired
+        self.is_expired = False
         
     def generate_question(self):
-        """Generate a random math question and its answer"""
         num1 = random.randint(1, 10)
         num2 = random.randint(1, 10)
         op = random.choice(operations)
@@ -64,7 +75,6 @@ class Problem:
         return f"{num1} {op} {num2}", answer
     
     def generate_choices(self):
-        """Generate answer choices including the correct answer"""
         choices = [self.answer]
         while len(choices) < 4:
             wrong = self.answer + random.randint(-10, 10)
@@ -74,7 +84,6 @@ class Problem:
         return choices
     
     def get_remaining_time(self):
-        """Get remaining time for this problem"""
         elapsed = time.time() - self.start_time
         return max(0, int(self.timer - elapsed))
 
@@ -106,88 +115,166 @@ def add_problem():
         problem = Problem(len(problems) + 1, x, y)
         problems.append(problem)
 
+def draw_info_panel():
+    info_surface = pygame.Surface((WIDTH * 0.3, HEIGHT * 0.8))
+    info_surface.fill(DARK_GRAY)
+    
+    # Draw count zone background for status
+    count_zone_scaled = pygame.transform.scale(COUNT_ZONE, (info_surface.get_width() - 20, 60))
+    info_surface.blit(count_zone_scaled, (10, 10))
+    
+    # Draw status text
+    remains_text = pixel_font.render("remains:", True, GREEN)
+    remains_value = pixel_font.render(f"{remains_done} / {remains_target}", True, GREEN)
+    info_surface.blit(remains_text, (20, 20))
+    info_surface.blit(remains_value, (remains_text.get_width() + 30, 20))
+    
+    problem_text = pixel_font.render("problem limit:", True, RED)
+    problem_value = pixel_font.render(f"{problem_count} / {problem_limit}", True, RED)
+    info_surface.blit(problem_text, (20, 40))
+    info_surface.blit(problem_value, (problem_text.get_width() + 30, 40))
+    
+    if current_problem:
+        # Draw problem header
+        problem_header_scaled = pygame.transform.scale(PROBLEM_BOX, 
+                                                     (info_surface.get_width() - 20, 40))
+        info_surface.blit(problem_header_scaled, (10, 80))
+        header_text = pixel_font.render(f"PROBLEM: N{current_problem.number}", True, (255, 215, 0))
+        info_surface.blit(header_text, (20, 90))
+        
+        # Draw timer 
+        pygame.draw.circle(info_surface, WHITE, 
+                         (info_surface.get_width() - 35, 100), 15, 1)
+        timer_text = pixel_font.render(str(current_problem.get_remaining_time()), True, WHITE)
+        timer_rect = timer_text.get_rect(center=(info_surface.get_width() - 35, 100))
+        info_surface.blit(timer_text, timer_rect)
+        
+        # Draw problem display
+        problem_display_scaled = pygame.transform.scale(PROBLEM_DISPLAY, 
+                                                      (info_surface.get_width() - 20, 80))
+        info_surface.blit(problem_display_scaled, (10, 130))
+        
+        # Draw question with = ?
+        question_text = pixel_font_large.render(current_problem.question, True, GREEN)
+        text_rect = question_text.get_rect(center=(info_surface.get_width()//2, 170))
+        info_surface.blit(question_text, text_rect)
+        
+        # Draw answer buttons
+        button_images = [ANS_RED, ANS_BLUE, ANS_YELLOW, ANS_GREEN]
+        button_height = 40
+        button_spacing = 10
+        button_y = 220
+        
+        for i, (choice, img) in enumerate(zip(current_problem.choices, button_images)):
+            button_rect = pygame.Rect(10, 
+                                    button_y + i * (button_height + button_spacing),
+                                    info_surface.get_width() - 20, 
+                                    button_height)
+            # Scale and draw button background image
+            button_scaled = pygame.transform.scale(img, (button_rect.width, button_rect.height))
+            info_surface.blit(button_scaled, button_rect)
+            
+            # Draw the choice number
+            choice_text = pixel_font.render(str(choice), True, WHITE)
+            text_rect = choice_text.get_rect(center=button_rect.center)
+            info_surface.blit(choice_text, text_rect)
+    
+    return info_surface
+
 def draw_problem_box(surface, problem):
-    """Draw the problem box with timer in top right"""
     # Box dimensions
     box_width = 200
     box_height = 80
     box_x = problem.x - box_width // 2
     box_y = problem.y - box_height // 2
     
-    # Draw main box
-    pygame.draw.rect(surface, DARK_GRAY, (box_x, box_y, box_width, box_height))
-    pygame.draw.rect(surface, GREEN, (box_x, box_y, box_width, box_height), 2)
+    # Scale and draw problem box background
+    problem_box_scaled = pygame.transform.scale(PROBLEM_BOX, (box_width, box_height))
+    surface.blit(problem_box_scaled, (box_x, box_y))
     
-    # Draw problem header
-    header_height = 25
-    pygame.draw.rect(surface, DARK_GRAY, (box_x, box_y, box_width, header_height))
-    pygame.draw.rect(surface, GREEN, (box_x, box_y, box_width, header_height), 2)
-    
-    # Draw problem number in header
+    # Draw problem text
     header_text = pixel_font.render(f"PROBLEM: N{problem.number}", True, (255, 215, 0))
     surface.blit(header_text, (box_x + 5, box_y + 5))
     
-    # Draw timer circle in top right of header
-    timer_circle_x = box_x + box_width - 15
-    timer_circle_y = box_y + header_height//2
-    pygame.draw.circle(surface, DARK_GRAY, (timer_circle_x, timer_circle_y), 10)
-    pygame.draw.circle(surface, WHITE, (timer_circle_x, timer_circle_y), 10, 1)
-    
-    # Draw timer text
+    # Draw timer
+    pygame.draw.circle(surface, WHITE, 
+                      (box_x + box_width - 15, box_y + 15), 10, 1)
     timer_text = pixel_font.render(str(problem.get_remaining_time()), True, WHITE)
-    timer_rect = timer_text.get_rect(center=(timer_circle_x, timer_circle_y))
+    timer_rect = timer_text.get_rect(center=(box_x + box_width - 15, box_y + 15))
     surface.blit(timer_text, timer_rect)
     
-    # Draw problem text
-    problem_text = font.render(problem.question, True, GREEN)
-    text_rect = problem_text.get_rect(center=(box_x + box_width//2, box_y + header_height + (box_height - header_height)//2))
-    surface.blit(problem_text, text_rect)
+    # Draw question
+    question_text = pixel_font_large.render(f"{problem.question} = ?", True, GREEN)
+    text_rect = question_text.get_rect(center=(box_x + box_width//2, 
+                                             box_y + box_height//2 + 10))
+    surface.blit(question_text, text_rect)
 
-def draw_info_panel():
-    """Draw the right-side information panel"""
-    info_surface = pygame.Surface((WIDTH * 0.3, HEIGHT * 0.8))
-    info_surface.fill(DARK_GRAY)
+
+def update_display():
+    # Draw background
+    screen.blit(BACKGROUND, (0, 0))
     
-    # Draw status information
-    difficulty_text = font.render("DIFFICULTY: EASY", True, GREEN)
-    remains_text = font.render(f"remains: {remains_done}/{remains_target}", True, GREEN)
-    limit_text = font.render(f"problem limit: {problem_count}/{problem_limit}", True, RED)
+    # Draw difficulty
+    difficulty_scaled = pygame.transform.scale(DIFFICULTY, (200, 40))
+    screen.blit(difficulty_scaled, (20, 20))
     
-    info_surface.blit(difficulty_text, (10, 10))
-    info_surface.blit(remains_text, (10, 50))
-    info_surface.blit(limit_text, (10, 80))
+    # Draw main game area
+    main_surface = pygame.Surface((WIDTH * 0.6, HEIGHT * 0.8))
+    # Use background image for gradient effect
+    main_bg = pygame.transform.scale(BACKGROUND, main_surface.get_size())
+    main_surface.blit(main_bg, (0, 0))
     
-    # Draw current problem if selected
-    if current_problem:
-        # Problem header
-        problem_label = font.render(f"PROBLEM: N{current_problem.number}", True, (255, 215, 0))
-        info_surface.blit(problem_label, (10, 140))
-        
-        # Problem display box
-        pygame.draw.rect(info_surface, (40, 40, 40), 
-                        (10, 180, info_surface.get_width() - 20, 80))
-        problem_text = font.render(f"{current_problem.question} = ?", True, GREEN)
-        text_rect = problem_text.get_rect(center=(info_surface.get_width() // 2, 220))
-        info_surface.blit(problem_text, text_rect)
-        
-        # Answer buttons
-        button_colors = [RED, BLUE, YELLOW, (0, 139, 0)]
-        button_height = 40
-        button_margin = 10
-        button_y = 300
-        
-        for i, choice in enumerate(current_problem.choices):
-            button_rect = pygame.Rect(10, 
-                                    button_y + i * (button_height + button_margin),
-                                    info_surface.get_width() - 20, 
-                                    button_height)
-            pygame.draw.rect(info_surface, button_colors[i], button_rect)
-            
-            text = font.render(f"ANS #{i+1}: {choice}", True, WHITE)
-            text_rect = text.get_rect(center=button_rect.center)
-            info_surface.blit(text, text_rect)
+    # Add scanlines
+    draw_scanlines(main_surface)
     
-    return info_surface
+    # Draw problems if any
+    for problem in problems:
+        draw_problem_box(main_surface, problem)
+    
+    # Draw border
+    pygame.draw.rect(main_surface, BORDER_GREEN, main_surface.get_rect(), 2)
+    
+    # Position main surface and info panel
+    screen.blit(main_surface, (50, 50))
+    info_panel = draw_info_panel()
+    screen.blit(info_panel, (WIDTH - info_panel.get_width() - 50, 50))
+    
+    # Draw bottom pixel pattern
+    pixel_height = 20
+    for x in range(0, WIDTH, 4):
+        for y in range(HEIGHT - pixel_height, HEIGHT, 4):
+            if (x + y) % 8 == 0:
+                pygame.draw.rect(screen, BORDER_GREEN, (x, y, 2, 2))
+    
+    pygame.display.flip()
+
+def draw_problem_box(surface, problem):
+    # Box dimensions
+    box_width = 200
+    box_height = 80
+    box_x = problem.x - box_width // 2
+    box_y = problem.y - box_height // 2
+    
+    # Scale and draw problem box background
+    problem_box_scaled = pygame.transform.scale(PROBLEM_BOX, (box_width, box_height))
+    surface.blit(problem_box_scaled, (box_x, box_y))
+    
+    # Draw problem text
+    header_text = pixel_font.render(f"PROBLEM: N{problem.number}", True, (255, 215, 0))
+    surface.blit(header_text, (box_x + 5, box_y + 5))
+    
+    # Draw timer
+    pygame.draw.circle(surface, WHITE, 
+                      (box_x + box_width - 15, box_y + 15), 10, 1)
+    timer_text = pixel_font.render(str(problem.get_remaining_time()), True, WHITE)
+    timer_rect = timer_text.get_rect(center=(box_x + box_width - 15, box_y + 15))
+    surface.blit(timer_text, timer_rect)
+    
+    # Draw question
+    question_text = pixel_font_large.render(problem.question, True, GREEN)
+    text_rect = question_text.get_rect(center=(box_x + box_width//2, 
+                                             box_y + box_height//2 + 10))
+    surface.blit(question_text, text_rect)
 
 # Add initial problems
 for _ in range(3):
@@ -198,7 +285,7 @@ running = True
 clock = pygame.time.Clock()
 
 while running:
-    screen.fill(BLACK)
+    screen.blit(BACKGROUND, (0, 0))
     
     # Create and draw main game area
     main_surface = pygame.Surface((WIDTH * 0.6, HEIGHT * 0.8))
@@ -251,10 +338,17 @@ while running:
             main_x = mouse_x - 50
             main_y = mouse_y - 50
             
-            # Check if a problem circle was clicked
+            # Check if a problem was clicked
             for problem in problems:
-                distance = ((problem.x - main_x) ** 2 + (problem.y - main_y) ** 2) ** 0.5
-                if distance < 15:  # Circle radius
+                # Calculate click area for the problem box
+                box_width = 200
+                box_height = 80
+                box_x = problem.x - box_width // 2
+                box_y = problem.y - box_height // 2
+                box_rect = pygame.Rect(box_x, box_y, box_width, box_height)
+                
+                # Check if click is within the box
+                if box_x <= main_x <= box_x + box_width and box_y <= main_y <= box_y + box_height:
                     current_problem = problem
                     break
             
@@ -262,7 +356,7 @@ while running:
             if current_problem and not current_problem.is_expired:
                 info_x = WIDTH - info_surface.get_width() - 50
                 info_y = 50
-                button_y = info_y + 300
+                button_y = info_y + 200  # Starting y position of answer buttons
                 
                 for i in range(4):
                     button_rect = pygame.Rect(
@@ -288,7 +382,7 @@ while running:
                         break
     
     pygame.display.flip()
-    clock.tick(200)
+    clock.tick(144)
 
 pygame.quit()
 sys.exit()
