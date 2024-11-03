@@ -2,13 +2,18 @@ import pygame, sys
 from PIL import Image
 import os
 
+# Initialize pygame with pre_init to reduce sound delay
+pygame.mixer.pre_init(44100, -16, 2, 512)  # Adjust buffer size if needed
 
 #game screen .. 100%
 pygame.init()
 width, height = 800, 600
 screen = pygame.display.set_mode((width, height), pygame.RESIZABLE)
-click_sound = pygame.mixer.Sound("./assets/sounds/click.wav")
 
+#click sound
+click_sound = pygame.mixer.Sound("./assets/sounds/click.wav")
+#meow sound 
+meow_sound = pygame.mixer.Sound("./assets/sounds/meow.mp3")
 #icon & name's bar ... 100%
 pygame.display.set_caption("KITCATS")
 icons = pygame.image.load("./assets/menu/cat-logo.png").convert_alpha()
@@ -100,17 +105,15 @@ pygame.mixer.music.load("./assets/music/music.mp3")
 pygame.mixer.music.set_volume(0.2)  
 pygame.mixer.music.play(loops=-1)
 
+        
+# Play meow sound when enter game
+if pygame.MOUSEBUTTONDOWN:
+    meow_sound.play()
+
 #Main Game Loop ... ??%
 running = True
 while running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-        
-        # Play click sound on any mouse click
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            click_sound.play()
-
+            
     screen.fill((226, 179, 209))
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
