@@ -466,21 +466,21 @@ while running:
 
         def draw_problem_box(surface, problem):
             # Draw problem boxes in the question area
-            box_width = 200
-            box_height = 80
+            box_width = 250
+            box_height = 100
             box_x = problem.x
             box_y = problem.y
 
             problem_surface = pygame.Surface((box_width, box_height), pygame.SRCALPHA)
-            pygame.draw.rect(problem_surface, (0, 0, 0, 128), (0, 0, box_width, box_height))
+            pygame.draw.rect(problem_surface, (0, 0, 0), (0, 0, box_width, box_height))
 
             # Draw problem text
-            problem_text = custom_font4.render(f"PROBLEM: {problem.number}", True, (74, 246, 38))
+            problem_text = custom_font4.render(f"PROBLEM: {problem.number}", True, (139, 139, 0))
             text_rect = problem_text.get_rect(topright=(box_width-5, 5))
             problem_surface.blit(problem_text, text_rect)
 
-            # Draw timer
-            timer_text = custom_font4.render(str(problem.get_remaining_time()), True, (255, 255, 255))
+            # Draw problems
+            timer_text = custom_font4.render(str(problem.question), True, (0, 255, 0))
             timer_rect = timer_text.get_rect(center=(box_width//2, box_height//2))
             problem_surface.blit(timer_text, timer_rect)
 
@@ -529,7 +529,7 @@ while running:
                     screen.blit(ans_text, (826, y_pos))
 
                 screen.blit(problem_num, (937.9, 197))
-                screen.blit(question_text, (757.33, 263.25))
+                screen.blit(question_text, (780.33, 263.25))
 
             # Draw UI elements
             screen.blit(text_difficulty, (64, 22))
@@ -578,6 +578,7 @@ while running:
                                     elif len(problems) < remains_target:
                                         add_problem()
                                 else:
+                                    # Decreasing time
                                     current_problem.timer *= 0.91
                                     current_problem.start_time = time.time()
                                 break
