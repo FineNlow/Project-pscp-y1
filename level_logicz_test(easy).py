@@ -59,8 +59,6 @@ def add_question():
         problem_count += 1  # Increment problem count
         timer = default_timer  # Reset timer to default when a new question is added
 
-
-
 # End game with message
 def end_game(message):
     print(message)
@@ -155,7 +153,7 @@ while running:
                                 add_question()
                                 current_time = time.time()  # Reset current time
                         else:
-                            # Reduce timer to 5% of the remaining time
+                            # Reduce timer to 0.9% of the remaining time
                             current_remaining = timer - (time.time() - current_time)
                             timer = max(1, current_remaining * 0.91)  # Reduce to 0.9% of current remaining time
                             current_time = time.time()  # Reset timer start time
