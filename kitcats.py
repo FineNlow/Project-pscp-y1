@@ -387,7 +387,7 @@ while running:
             assets['score_back'] = pygame.image.load("./assets/easy mode/score-background.png").convert_alpha()
             assets['problem_back'] = pygame.image.load("./assets/easy mode/Ploblem rec.png").convert_alpha()
             assets['problem_quiz'] = pygame.image.load("./assets/easy mode/Ploblem quiz.png").convert_alpha()
-            assets['problem_num'] = pygame.image.load("./assets/easy mode/problem_num.png").convert_alpha()
+            assets['time_count'] = pygame.image.load("./assets/easy mode/time_count.png").convert_alpha()
             assets['ans1_back'] = pygame.image.load("./assets/easy mode/ans1_red.png").convert_alpha()
             assets['ans2_back'] = pygame.image.load("./assets/easy mode/ans2_blue.png").convert_alpha()
             assets['ans3_back'] = pygame.image.load("./assets/easy mode/ans3_yellow.png").convert_alpha()
@@ -403,7 +403,7 @@ while running:
             assets['score_back'] = pygame.transform.scale(assets['score_back'], (256, 75.75))
             assets['problem_back'] = pygame.transform.scale(assets['problem_back'], (256.71, 168))
             assets['problem_quiz'] = pygame.transform.scale(assets['problem_quiz'], (231.82, 112.5))
-            assets['problem_num'] = pygame.transform.scale(assets['problem_num'], (28, 29))
+            assets['time_count'] = pygame.transform.scale(assets['time_count'], (34, 33))
             assets['ans1_back'] = pygame.transform.scale(assets['ans1_back'], (244.62, 46.5))
             assets['ans2_back'] = pygame.transform.scale(assets['ans2_back'], (244.62, 46.5))
             assets['ans3_back'] = pygame.transform.scale(assets['ans3_back'], (244.62, 46.5))
@@ -411,6 +411,7 @@ while running:
             assets['cat'] = pygame.transform.scale(assets['cat'], (22, 20))
             
             return assets
+
         # Game variables
         remains_target = 5
         problem_limit = 10
@@ -420,7 +421,8 @@ while running:
         current_problem = None
         remains_done = 0
         problem_count = 0
-
+        DARK_GRAY = (20, 20, 20)
+        GREEN = (0, 255, 0)
         class Problem:
             def __init__(self, number, x, y):
                 self.number = number
@@ -433,8 +435,8 @@ while running:
                 self.is_expired = False
 
             def generate_question(self):
-                num1 = random.randint(1, 10)
-                num2 = random.randint(1, 10)
+                num1 = random.randint(1, 250)
+                num2 = random.randint(1, 250)
                 op = random.choice(['+', '-'])
                 if op == '+':
                     answer = num1 + num2
@@ -472,15 +474,23 @@ while running:
             box_y = problem.y
 
             problem_surface = pygame.Surface((box_width, box_height), pygame.SRCALPHA)
-            pygame.draw.rect(problem_surface, (0, 0, 0), (0, 0, box_width, box_height))
+
+            # Draw main box
+            pygame.draw.rect(surface, DARK_GRAY, (box_x, box_y, box_width, box_height))
+            pygame.draw.rect(surface, GREEN, (box_x, box_y, box_width, box_height), 2)
+            
+            # Draw problem header
+            header_height = 25
+            pygame.draw.rect(surface, DARK_GRAY, (box_x, box_y, box_width, header_height))
+            pygame.draw.rect(surface, GREEN, (box_x, box_y, box_width, header_height), 2)
 
             # Draw problem text
-            problem_text = custom_font4.render(f"PROBLEM: {problem.number}", True, (139, 139, 0))
-            text_rect = problem_text.get_rect(topright=(box_width-5, 5))
+            problem_text = custom_font4.render(f"PROBLEM: {problem.number}", True, (224, 165, 56))
+            text_rect = problem_text.get_rect(topright=(box_width - 5, 5))
             problem_surface.blit(problem_text, text_rect)
 
             # Draw problems
-            timer_text = custom_font4.render(str(problem.question), True, (0, 255, 0))
+            timer_text = custom_font2.render(str(problem.question), True, (0, 255, 0))
             timer_rect = timer_text.get_rect(center=(box_width//2, box_height//2))
             problem_surface.blit(timer_text, timer_rect)
 
@@ -496,9 +506,8 @@ while running:
             screen.blit(assets['score_back'], (709.69, 77.25))
             screen.blit(assets['problem_back'], (708.98, 187.5))
             screen.blit(assets['problem_quiz'], (721.78, 225.75))
-            screen.blit(assets['problem_num'], (927.98, 196.5))
+            screen.blit(assets['time_count'], (927.98, 196.5))
             screen.blit(assets['cat'], (605, 81))
-
             # Draw UI text
             text_difficulty = custom_font1.render("DIFFICULTY :", True, (255, 255, 255))
             text_easy = custom_font1.render("EASY", True, (76, 255, 17))
@@ -506,7 +515,7 @@ while running:
             text_cnt_remains = custom_font4.render(f"{remains_done}/{remains_target}", True, (255, 255, 255))
             text_problemlimit = custom_font3.render("problem limit :", True, (220, 0, 4))
             text_cnt_problemlimit = custom_font4.render(f"{problem_count}/{problem_limit}", True, (255, 255, 255))
-
+            text_time = custom_font4.render(str(problem.get_remaining_time()), True, (224, 165, 56))
             # Draw answer buttons
             answer_buttons = [
                 (assets['ans1_back'], (715.38, 391.5)),
@@ -520,7 +529,7 @@ while running:
 
             # Draw current problem info if selected
             if current_problem:
-                problem_num = custom_font4.render(str(current_problem.number), True, (224, 165, 56))
+                question_num = custom_font4.render(f"PROBLEM: {str(current_problem.number)}", True, (224, 165, 56))
                 question_text = custom_font1.render(current_problem.question + " = ?", True, (74, 246, 38))
 
                 for i, choice in enumerate(current_problem.choices):
@@ -528,8 +537,8 @@ while running:
                     y_pos = 401 + i * 65
                     screen.blit(ans_text, (826, y_pos))
 
-                screen.blit(problem_num, (937.9, 197))
-                screen.blit(question_text, (780.33, 263.25))
+                screen.blit(question_num, (725, 197))
+                screen.blit(question_text, (740.33, 263.25))
 
             # Draw UI elements
             screen.blit(text_difficulty, (64, 22))
@@ -538,10 +547,11 @@ while running:
             screen.blit(text_problemlimit, (721.78, 117.75))
             screen.blit(text_cnt_remains, (908.09, 92.25))
             screen.blit(text_cnt_problemlimit, (908.09, 117.75))
-
+            screen.blit(text_time, (937.9, 197))
         # Game initialization
         assets = load_game_assets()
         for _ in range(3):
+            problem_count += 1
             add_problem()
 
         # Main game loop
@@ -558,38 +568,43 @@ while running:
                     # Check for problem clicks in question area
                     if 50 <= mouse_x <= 639 and 70 <= mouse_y <= 676:
                         for problem in problems:
-                            if problem.x <= mouse_x <= problem.x + 200 and problem.y <= mouse_y <= problem.y + 80:
+                            problem_rect = pygame.Rect((problem.x- 250 // 2),(problem.y- 100 // 2),250,100)
+                            if problem_rect.collidepoint(mouse_x-175, mouse_y-125):
                                 current_problem = problem
                                 break
 
                     # Check for answer button clicks
-                    if current_problem and not current_problem.is_expired:
+                    if current_problem:
                         button_y_positions = [391.5, 456.75, 522, 587.25]
                         for i, y_pos in enumerate(button_y_positions):
                             button_rect = pygame.Rect(715.38, y_pos, 244.62, 46.5)
                             if button_rect.collidepoint(mouse_x, mouse_y):
                                 if current_problem.choices[i] == current_problem.answer:
                                     remains_done += 1
+                                    problem_count -= 1
                                     problems.remove(current_problem)
                                     current_problem = None
+                                    problem.start_time = time.time()
+                                    if not problem_count:
+                                        for _ in range(3):
+                                            problem_count += 1
+                                            add_problem()
+                                        break
                                     if remains_done == remains_target:
                                         running = False
                                         print("You won!")
-                                    elif len(problems) < remains_target:
-                                        add_problem()
                                 else:
                                     # Decreasing time
-                                    current_problem.timer *= 0.91
-                                    current_problem.start_time = time.time()
+                                    problem.timer *= 0.91
                                 break
 
             # Update problems
             for problem in problems[:]:
                 if problem.get_remaining_time() <= 0 and not problem.is_expired:
                     problem.is_expired = True
-                    problem_count += 1
-                    problems.remove(problem)
+                    problem.start_time = time.time()
                     if problem_count < problem_limit:
+                        problem_count += 1
                         add_problem()
 
             # Check game over condition
@@ -631,8 +646,8 @@ while running:
         problem_back = pygame.transform.scale(problem_back, (256.71, 168))
         problem_quiz = pygame.image.load("./assets/easy mode/Ploblem quiz.png").convert_alpha()
         problem_quiz = pygame.transform.scale(problem_quiz, (231.82, 112.5))
-        problem_num = pygame.image.load("./assets/easy mode/problem_num.png").convert_alpha()
-        problem_num = pygame.transform.scale(problem_num, (28, 29))
+        time_count = pygame.image.load("./assets/easy mode/time_count.png").convert_alpha()
+        time_count = pygame.transform.scale(time_count, (28, 29))
         ans1_back = pygame.image.load("./assets/easy mode/ans1_red.png").convert_alpha()
         ans1_back = pygame.transform.scale(ans1_back, (244.62, 46.5))
         ans2_back = pygame.image.load("./assets/easy mode/ans2_blue.png").convert_alpha()
@@ -651,7 +666,7 @@ while running:
         screen.blit(score_back, (709.69, 77.25))
         screen.blit(problem_back, (708.98, 187.5))
         screen.blit(problem_quiz, (721.78, 225.75))
-        screen.blit(problem_num, (927.98, 196.5))
+        screen.blit(time_count, (927.98, 196.5))
         screen.blit(ans1_back, (715.38, 391.5))
         screen.blit(ans2_back, (715.38, 456.75))
         screen.blit(ans3_back, (715.38, 522))
@@ -719,8 +734,8 @@ while running:
         problem_back = pygame.transform.scale(problem_back, (256.71, 168))
         problem_quiz = pygame.image.load("./assets/easy mode/Ploblem quiz.png").convert_alpha()
         problem_quiz = pygame.transform.scale(problem_quiz, (231.82, 112.5))
-        problem_num = pygame.image.load("./assets/easy mode/problem_num.png").convert_alpha()
-        problem_num = pygame.transform.scale(problem_num, (28, 29))
+        time_count = pygame.image.load("./assets/easy mode/time_count.png").convert_alpha()
+        time_count = pygame.transform.scale(time_count, (28, 29))
         ans1_back = pygame.image.load("./assets/easy mode/ans1_red.png").convert_alpha()
         ans1_back = pygame.transform.scale(ans1_back, (244.62, 46.5))
         ans2_back = pygame.image.load("./assets/easy mode/ans2_blue.png").convert_alpha()
@@ -739,7 +754,7 @@ while running:
         screen.blit(score_back, (709.69, 77.25))
         screen.blit(problem_back, (708.98, 187.5))
         screen.blit(problem_quiz, (721.78, 225.75))
-        screen.blit(problem_num, (927.98, 196.5))
+        screen.blit(time_count, (927.98, 196.5))
         screen.blit(ans1_back, (715.38, 391.5))
         screen.blit(ans2_back, (715.38, 456.75))
         screen.blit(ans3_back, (715.38, 522))
