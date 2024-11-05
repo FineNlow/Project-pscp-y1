@@ -7,6 +7,15 @@ pygame.init()
 width, height = 1024, 768
 screen = pygame.display.set_mode((width, height))
 
+# Colors
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+RED = (255, 0, 0)
+GREEN = (0, 255, 0)
+BLUE = (0, 0, 255)
+#fonts
+font = pygame.font.Font(None, 50)
+
 #icon & name's bar ... 100%
 pygame.display.set_caption("KITCATS")
 icons = pygame.image.load("./assets/menu/cat-logo.png").convert_alpha()
@@ -104,7 +113,93 @@ while running:
             width, height = event.w, event.h
             screen = pygame.display.set_mode((width, height), pygame.RESIZABLE)
         screen.fill((226, 179, 209))
+    
+    def draw_text(text, font, color, surface, x, y):
+        textobj = font.render(text, True, color)
+        textrect = textobj.get_rect(center=(x, y))
+        surface.blit(textobj, textrect)
+    
+    def game_afterwin_screen():
+        screen.fill(BLACK)
+        draw_text("Play agian?", font, RED, screen, 300, 150)
+    
+        # Draw Yes and No buttons
+        pygame.draw.rect(screen, WHITE, (175, 250, 100, 50))
+        pygame.draw.rect(screen, WHITE, (325, 250, 100, 50))
+        draw_text("Yes", font, BLACK, screen, 225, 275)
+        draw_text("No", font, BLACK, screen, 375, 275)
+    
+        pygame.display.flip()
 
+    def reset_game():
+        global menu
+        menu = True
+    # Reset any other game variables here
+
+    def sendback_to_level():
+        screen.fill((226, 179, 209))
+        levelground = pygame.image.load("./assets/menu/cat-background.png")
+        levelground = pygame.transform.scale(levelground,(width, height))
+        screen.blit(levelground, (0,0))
+
+        scale_factor = height/500 + 2
+        frames = gifgen('./assets/menu/cat-gif-menu.gif', scale_factor)
+
+        if frames:
+            frame_timer += clock.get_time()  # 
+            if frame_timer >= frame_delay:
+                frame_index = (frame_index + 1) % len(frames)
+                frame_timer = 0
+
+            frame = frames[frame_index]
+            screen.blit(frame, (width*0.4 - 200,height - 490))
+
+        back_button = pygame.image.load("./assets/setting/goback.png").convert_alpha()
+        back_button = pygame.transform.scale(back_button, (40, 30))
+        back_button_pos = (20, height // height + (height*0.03))
+        screen.blit(back_button, back_button_pos)
+
+        select_level = pygame.image.load("./assets/select_level/select text.png").convert_alpha()
+        select_level = pygame.transform.scale(select_level, (615, 115))
+        select_level_pos = (50, height // height + (height*0.07))
+        screen.blit(select_level, select_level_pos)
+
+        #easy mode button
+        level_easy = pygame.image.load("./assets/select_level/click easy.png").convert_alpha()
+        level_easy= pygame.transform.scale(level_easy, (350, 400))
+        level_easy_pos = (50, height // height + (height*0.25))
+
+        #normal mode button
+        level_normal = pygame.image.load("./assets/select_level/click normal.png").convert_alpha()
+        level_normal= pygame.transform.scale(level_normal, (350, 400))
+        level_normal_pos = (350, height // height + (height*0.25))
+
+        #hard mode button
+        level_hard = pygame.image.load("./assets/select_level/click hard.png").convert_alpha()
+        level_hard= pygame.transform.scale(level_hard, (350, 400))
+        level_hard_pos = (650, height // height + (height*0.25))
+
+        #level selected button
+        screen.blit(level_easy, level_easy_pos)
+        screen.blit(level_normal, level_normal_pos)
+        screen.blit(level_hard, level_hard_pos)
+
+        if check_button_click(back_button, *back_button_pos):
+            current_screen = "menu"
+
+        #Click select easy mode
+        if check_button_click(level_easy, *level_easy_pos):
+            current_screen = "easy mode"
+
+        #Chick select medium mode
+        if check_button_click(level_normal, *level_normal_pos):
+            current_screen = "normal mode"
+
+        #Click select hard mode
+        if check_button_click(level_hard, *level_hard_pos):
+            current_screen = "hard mode"
+        
+        pygame.display.flip()
     #Game menu ... 60% (add backgound gif)
     if current_screen == "menu":
         levelground = pygame.image.load("./assets/menu/cat-background.png")
@@ -569,6 +664,9 @@ while running:
         running = True
         clock = pygame.time.Clock()
 
+        #playing state
+        menu = False
+
         while running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -602,8 +700,34 @@ while running:
                                             current_time = time.time()
                                             add_problem()
                                     if remains_done == remains_target:
-                                        running = False
-                                        print("You won!")
+                                        screen.fill(BLACK)
+                                        draw_text("Time's Up! Game Over", font, RED, screen, 300, 150)
+                                        
+                                        # Draw Yes and No buttons
+                                        pygame.draw.rect(screen, WHITE, (175, 250, 100, 50))
+                                        pygame.draw.rect(screen, WHITE, (325, 250, 100, 50))
+                                        draw_text("Yes", font, BLACK, screen, 225, 275)
+                                        draw_text("No", font, BLACK, screen, 375, 275)
+                                                        #325 <= mouse_pos[0] <= 425 and 250 <= mouse_pos[1] <= 300:
+                                                        #main_menu = True
+                                                        #game_over = False
+                                        
+                                        for event in pygame.event.get():
+                                            if event.type == pygame.QUIT:
+                                                pygame.quit()
+                                                sys.exit()
+                                            
+                                            if menu:
+                                                if event.type == pygame.MOUSEBUTTONDOWN:
+                                                    mouse_pos = event.pos
+                                                    # Yes Button (Restart)
+                                                    if 175 <= mouse_pos[0] <= 275 and 250 <= mouse_pos[1] <= 300:
+                                                        reset_game()
+                                                    # No Button (Go to Main Menu)
+                                                    else:
+                                                        running = False
+                                        pygame.display.flip()
+                                                            
                                 else:
                                     # Decreasing time
                                     reduce_game_timer()
@@ -639,7 +763,6 @@ while running:
 
             screen.blit(pause_button,pause_button_pos)
             if check_button_click(pause_button, *pause_button_pos):
-                period_screen = "hard mode"
                 current_screen = "pause"
 
             pygame.display.flip()
@@ -952,7 +1075,6 @@ while running:
 
             screen.blit(pause_button,pause_button_pos)
             if check_button_click(pause_button, *pause_button_pos):
-                period_screen = "hard mode"
                 current_screen = "pause"
 
             pygame.display.flip()
@@ -1265,7 +1387,6 @@ while running:
 
             screen.blit(pause_button,pause_button_pos)
             if check_button_click(pause_button, *pause_button_pos):
-                period_screen = "hard mode"
                 current_screen = "pause"
 
             pygame.display.flip()
