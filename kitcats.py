@@ -185,7 +185,7 @@ while running:
         if check_button_click(not_confirm, *not_confirm_pos):
             current_screen = period_screen
 
-    #setting menu ...65% (elementครบ เหลือmute sound & song, หน้า tutorial & credits)
+    #setting menu
     if current_screen == "setting menu":
         screen.fill((226, 179, 209))
         setting_menu_tab = pygame.image.load("./assets/setting/settingtab.png").convert_alpha()
@@ -634,7 +634,7 @@ while running:
             screen.blit(question_surface, (50, 70))
 
             #Setting button
-            pause_button = pygame.transform.scale(pause_button, (41,38))
+            pause_button = pygame.transform.scale(pause_button, (34,32))
             pause_button_pos = (width - width*0.0625, height - height*0.98)
 
             screen.blit(pause_button,pause_button_pos)
@@ -650,9 +650,9 @@ while running:
         def load_game_assets():
             assets = {}
             assets['background'] = pygame.image.load("./assets/normal mode/normal wall.png").convert_alpha()
-            assets['question_back'] = pygame.image.load("./assets/easy mode/ansback.png").convert_alpha()
+            assets['question_back'] = pygame.image.load("./assets/normal mode/Rectangle 9943.png").convert_alpha()
             assets['question_white'] = pygame.image.load("./assets/easy mode/ansbackwhite.png").convert_alpha()
-            assets['wall'] = pygame.image.load("./assets/easy mode/wall.png").convert_alpha()
+            assets['wall'] = pygame.image.load("./assets/normal mode/Rectangle 9960.png").convert_alpha()
             assets['ansback'] = pygame.image.load("./assets/easy mode/answall.png").convert_alpha()
             assets['score_back'] = pygame.image.load("./assets/easy mode/score-background.png").convert_alpha()
             assets['problem_back'] = pygame.image.load("./assets/easy mode/Ploblem rec.png").convert_alpha()
@@ -947,7 +947,7 @@ while running:
             screen.blit(question_surface, (50, 70))
             
             #Setting button
-            pause_button = pygame.transform.scale(pause_button, (41,38))
+            pause_button = pygame.transform.scale(pause_button, (34,32))
             pause_button_pos = (width - width*0.0625, height - height*0.98)
 
             screen.blit(pause_button,pause_button_pos)
@@ -963,9 +963,9 @@ while running:
         def load_game_assets():
             assets = {}
             assets['background'] = pygame.image.load("./assets/hard mode/hard wall.png").convert_alpha()
-            assets['question_back'] = pygame.image.load("./assets/easy mode/ansback.png").convert_alpha()
+            assets['question_back'] = pygame.image.load("./assets/hard mode/Rectangle 9943.png").convert_alpha()
             assets['question_white'] = pygame.image.load("./assets/hard mode/hardback.png").convert_alpha()
-            assets['wall'] = pygame.image.load("./assets/easy mode/wall.png").convert_alpha()
+            assets['wall'] = pygame.image.load("./assets/hard mode/Rectangle 9963.png").convert_alpha()
             assets['ansback'] = pygame.image.load("./assets/easy mode/answall.png").convert_alpha()
             assets['score_back'] = pygame.image.load("./assets/easy mode/score-background.png").convert_alpha()
             assets['problem_back'] = pygame.image.load("./assets/easy mode/Ploblem rec.png").convert_alpha()
@@ -1260,7 +1260,7 @@ while running:
             screen.blit(question_surface, (50, 70))
             
             #Setting button
-            pause_button = pygame.transform.scale(pause_button, (41,38))
+            pause_button = pygame.transform.scale(pause_button, (34,32))
             pause_button_pos = (width - width*0.0625, height - height*0.98)
 
             screen.blit(pause_button,pause_button_pos)
