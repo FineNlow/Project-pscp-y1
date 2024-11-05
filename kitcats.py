@@ -855,7 +855,7 @@ while running:
             # Draw current problem info if selected
             if current_problem:
                 question_num = custom_font4.render(f"PROBLEM: {str(current_problem.number)}", True, (224, 165, 56))
-                question_text = custom_font1.render(current_problem.question + " = ?", True, (74, 246, 38))
+                question_text = custom_font2.render(current_problem.question + " = ?", True, (74, 246, 38))
 
                 for i, choice in enumerate(current_problem.choices):
                     ans_text = custom_font4.render(f"{choice}", True, (0, 0, 0))
