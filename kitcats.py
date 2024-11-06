@@ -14,6 +14,9 @@ pygame.mixer.pre_init(44100, -16, 2, 512)  # Adjust buffer size if needed
 click_sound = pygame.mixer.Sound("./assets/sounds/click.wav")
 click_sound.set_volume(0.2)
 
+popup_image = pygame.image.load("./assets/menu/WIN.png")  # Replace with your PNG file path
+popup_rect = popup_image.get_rect(center=(1024 // 2, 768 // 2))
+
 #icon & name's bar ... 100%
 pygame.display.set_caption("KITCATS")
 icons = pygame.image.load("./assets/menu/cat-logo.png").convert_alpha()
@@ -586,10 +589,10 @@ while running:
         running = True
         clock = pygame.time.Clock()
 
+        win_screen = False
         while running:
-            if yay_screen:
-                current_screen = pygame.image.load("./assets/menu/yaydid.jpg")
-                
+            #gamestate
+
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
@@ -622,8 +625,11 @@ while running:
                                             current_time = time.time()
                                             add_problem()
                                     if remains_done == remains_target:
-                                        yay_screen = True
-                                        pygame.display.flip()
+                                        win_screen = True
+                                        if win_screen:
+                                            screen.blit(popup_image, popup_rect)
+                                            pygame.display.flip()
+                                            clock.tick(1)
                                 else:
                                     # Decreasing time
                                     reduce_game_timer()
