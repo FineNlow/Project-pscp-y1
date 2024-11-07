@@ -1,9 +1,8 @@
 import pygame, sys
-from PIL import Image
 import time, random
-import os
+from PIL import Image
 
-#game screen .. 100%
+#game screen
 pygame.init()
 width, height = 1024, 768
 screen = pygame.display.set_mode((width, height))
@@ -14,15 +13,12 @@ pygame.mixer.pre_init(44100, -16, 2, 512)  # Adjust buffer size if needed
 click_sound = pygame.mixer.Sound("./assets/sounds/click.wav")
 click_sound.set_volume(0.2)
 
-popup_image = pygame.image.load("./assets/menu/WIN.png")  # Replace with your PNG file path
-popup_rect = popup_image.get_rect(center=(1024 // 2, 768 // 2))
-
-#icon & name's bar ... 100%
+#icon & name's bar
 pygame.display.set_caption("KITCATS")
 icons = pygame.image.load("./assets/menu/cat-logo.png").convert_alpha()
 pygame.display.set_icon(icons)
 
-#Game menu element image ... 99%
+#Game menu element image
 background = screen.fill((226, 179, 209))
 gamename = pygame.image.load("./assets/menu/name.png").convert_alpha() #Game's name image
 
@@ -123,7 +119,7 @@ while running:
             screen = pygame.display.set_mode((width, height), pygame.RESIZABLE)
         screen.fill((226, 179, 209))
 
-    #Game menu ... 60% (add backgound gif)
+    #Game menu (add backgound gif)
     if current_screen == "menu":
         levelground = pygame.image.load("./assets/menu/cat-background.png")
         levelground = pygame.transform.scale(levelground,(width, height))
@@ -203,7 +199,7 @@ while running:
         if check_button_click(not_confirm, *not_confirm_pos):
             current_screen = period_screen
 
-    #setting menu ...65% (elementครบ เหลือmute sound & song, หน้า tutorial & credits)
+    #setting menu
     if current_screen == "setting menu":
         screen.fill((226, 179, 209))
         setting_menu_tab = pygame.image.load("./assets/setting/settingtab.png").convert_alpha()
@@ -289,7 +285,7 @@ while running:
         def scale_how_to_play_image(size):
             return pygame.transform.scale(how_to_play_image, size)
 
-    #Tutorial ...10% (สอนวิธีเล่น)
+    #Tutorial
     elif current_screen == "How to play":
         screen.fill((226, 179, 209))
 
@@ -307,7 +303,7 @@ while running:
         if check_button_click(back_button, *back_button_pos):
             current_screen = period_screen
 
-    #Credits ...10% (ใส่เครดิต)
+    #Credits
     elif current_screen == "credits":
         screen.fill((226, 179, 209))
 
@@ -426,8 +422,6 @@ while running:
             
             return assets
 
-        #game state
-        yay_screen = False
         # Game variables
         remains_target = 5
         problem_limit = 10
@@ -589,10 +583,7 @@ while running:
         running = True
         clock = pygame.time.Clock()
 
-        win_screen = False
         while running:
-            #gamestate
-
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
@@ -625,11 +616,11 @@ while running:
                                             current_time = time.time()
                                             add_problem()
                                     if remains_done == remains_target:
-                                        win_screen = True
-                                        if win_screen:
-                                            screen.blit(popup_image, popup_rect)
-                                            pygame.display.flip()
-                                            clock.tick(1)
+                                        back_img = pygame.image.load("./assets/menu/WIN.png").convert_alpha()
+                                        win = pygame.transform.scale(back_img, (width, height))
+                                        screen.blit(win, (0, 0))
+                                        pygame.display.flip()
+                                        pygame.time.wait(15555)
                                 else:
                                     # Decreasing time
                                     reduce_game_timer()
@@ -648,8 +639,11 @@ while running:
 
             # Check game over condition
             if problem_count >= problem_limit:
-                running = False
-
+                back_img = pygame.image.load("./assets/menu/LOSE.png").convert_alpha()
+                lose = pygame.transform.scale(back_img, (width, height))
+                screen.blit(lose, (0, 0))
+                pygame.display.flip()
+                pygame.time.wait(15555)
             # Draw game screen
             draw_game_screen(assets)
 
@@ -659,19 +653,10 @@ while running:
                 draw_problem_box(question_surface, problem)
             screen.blit(question_surface, (50, 70))
 
-            #Setting button
-            pause_button = pygame.transform.scale(pause_button, (41,38))
-            pause_button_pos = (width - width*0.0625, height - height*0.98)
-
-            screen.blit(pause_button,pause_button_pos)
-            if check_button_click(pause_button, *pause_button_pos):
-                period_screen = "hard mode"
-                current_screen = "pause"
-
             pygame.display.flip()
             clock.tick(60)
 
-    #Medium mode window
+    # Medium mode window
     elif current_screen == "normal mode":
         def load_game_assets():
             assets = {}
@@ -799,7 +784,7 @@ while running:
         def reduce_game_timer():
             global game_timer, start_time
             remaining_time = get_remaining_game_time()
-            game_timer = remaining_time * 0.30  # ลดเวลาที่เหลือโดยคูณด้วย 0.70
+            game_timer = remaining_time * 0.30  # ลดเวลาที่เหลือโดยคูณด้วย 0.30
             start_time = time.time()            # อัปเดตเวลาเริ่มต้นใหม่
 
         def get_remaining_game_time():
@@ -972,15 +957,6 @@ while running:
                 draw_problem_box(question_surface, problem)
             screen.blit(question_surface, (50, 70))
             
-            #Setting button
-            pause_button = pygame.transform.scale(pause_button, (41,38))
-            pause_button_pos = (width - width*0.0625, height - height*0.98)
-
-            screen.blit(pause_button,pause_button_pos)
-            if check_button_click(pause_button, *pause_button_pos):
-                period_screen = "hard mode"
-                current_screen = "pause"
-
             pygame.display.flip()
             clock.tick(60)
 
@@ -1255,8 +1231,7 @@ while running:
                                             problem_count += 1
                                             add_problem()
                                     if remains_done == remains_target:
-                                        running = False
-                                        print("You won!")
+                                        game_win()
                                 else:
                                     # Decreasing time
                                     reduce_game_timer()
@@ -1284,15 +1259,6 @@ while running:
             for problem in problems:
                 draw_problem_box(question_surface, problem)
             screen.blit(question_surface, (50, 70))
-            
-            #Setting button
-            pause_button = pygame.transform.scale(pause_button, (41,38))
-            pause_button_pos = (width - width*0.0625, height - height*0.98)
-
-            screen.blit(pause_button,pause_button_pos)
-            if check_button_click(pause_button, *pause_button_pos):
-                period_screen = "hard mode"
-                current_screen = "pause"
 
             pygame.display.flip()
             clock.tick(60)
