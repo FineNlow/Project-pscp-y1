@@ -928,7 +928,6 @@ while running:
                                             add_problem()
                                     if remains_done == remains_target:
                                         running = False
-                                        print("You won!")
                                 else:
                                     # Decreasing time
                                     reduce_game_timer()
@@ -1231,7 +1230,7 @@ while running:
                                             problem_count += 1
                                             add_problem()
                                     if remains_done == remains_target:
-                                        game_win()
+                                        running = False
                                 else:
                                     # Decreasing time
                                     reduce_game_timer()
