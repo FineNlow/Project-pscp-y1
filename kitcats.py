@@ -582,7 +582,6 @@ while running:
         # Main game loop
         running = True
         clock = pygame.time.Clock()
-
         while running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -928,7 +927,11 @@ while running:
                                             problem_count += 1
                                             add_problem()
                                     if remains_done == remains_target:
-                                        running = False
+                                        back_img = pygame.image.load("./assets/menu/WIN.png").convert_alpha()
+                                        win = pygame.transform.scale(back_img, (width, height))
+                                        screen.blit(win, (0, 0))
+                                        pygame.display.flip()
+                                        pygame.time.wait(15555)
                                 else:
                                     # Decreasing time
                                     reduce_game_timer()
@@ -946,7 +949,11 @@ while running:
 
             # Check game over condition
             if problem_count >= problem_limit:
-                running = False
+                back_img = pygame.image.load("./assets/menu/LOSE.png").convert_alpha()
+                lose = pygame.transform.scale(back_img, (width, height))
+                screen.blit(lose, (0, 0))
+                pygame.display.flip()
+                pygame.time.wait(15555)
 
             # Draw game screen
             draw_game_screen(assets)
@@ -1231,7 +1238,11 @@ while running:
                                             problem_count += 1
                                             add_problem()
                                     if remains_done == remains_target:
-                                        running = False
+                                        back_img = pygame.image.load("./assets/menu/WIN.png").convert_alpha()
+                                        win = pygame.transform.scale(back_img, (width, height))
+                                        screen.blit(win, (0, 0))
+                                        pygame.display.flip()
+                                        pygame.time.wait(15555)
                                 else:
                                     # Decreasing time
                                     reduce_game_timer()
@@ -1249,7 +1260,11 @@ while running:
 
             # Check game over condition
             if problem_count >= problem_limit:
-                running = False
+                back_img = pygame.image.load("./assets/menu/LOSE.png").convert_alpha()
+                lose = pygame.transform.scale(back_img, (width, height))
+                screen.blit(lose, (0, 0))
+                pygame.display.flip()
+                pygame.time.wait(15555)
 
             # Draw game screen
             draw_game_screen(assets)
