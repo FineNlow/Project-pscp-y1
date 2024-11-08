@@ -588,6 +588,7 @@ while running:
                     running = False
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     mouse_x, mouse_y = pygame.mouse.get_pos()
+                    click_sound.play()
 
                     # Check for problem clicks in question area
                     if 50 <= mouse_x <= 639 and 70 <= mouse_y <= 676:
@@ -619,7 +620,8 @@ while running:
                                         win = pygame.transform.scale(back_img, (width, height))
                                         screen.blit(win, (0, 0))
                                         pygame.display.flip()
-                                        pygame.time.wait(15555)
+                                        pygame.time.wait(10000)
+                                        running = False
                                 else:
                                     # Decreasing time
                                     reduce_game_timer()
@@ -642,7 +644,8 @@ while running:
                 lose = pygame.transform.scale(back_img, (width, height))
                 screen.blit(lose, (0, 0))
                 pygame.display.flip()
-                pygame.time.wait(15555)
+                pygame.time.wait(10000)
+                running = False
 
             # Draw game screen
             draw_game_screen(assets)
@@ -901,6 +904,7 @@ while running:
                     running = False
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     mouse_x, mouse_y = pygame.mouse.get_pos()
+                    click_sound.play()
 
                     # Check for problem clicks in question area
                     if 50 <= mouse_x <= 639 and 70 <= mouse_y <= 676:
@@ -931,7 +935,8 @@ while running:
                                         win = pygame.transform.scale(back_img, (width, height))
                                         screen.blit(win, (0, 0))
                                         pygame.display.flip()
-                                        pygame.time.wait(15555)
+                                        pygame.time.wait(10000)
+                                        running = False
                                 else:
                                     # Decreasing time
                                     reduce_game_timer()
@@ -953,7 +958,8 @@ while running:
                 lose = pygame.transform.scale(back_img, (width, height))
                 screen.blit(lose, (0, 0))
                 pygame.display.flip()
-                pygame.time.wait(15555)
+                pygame.time.wait(10000)
+                running = False
 
             # Draw game screen
             draw_game_screen(assets)
@@ -1212,6 +1218,7 @@ while running:
                     running = False
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     mouse_x, mouse_y = pygame.mouse.get_pos()
+                    click_sound.play()
 
                     # Check for problem clicks in question area
                     if 50 <= mouse_x <= 639 and 70 <= mouse_y <= 676:
@@ -1242,7 +1249,9 @@ while running:
                                         win = pygame.transform.scale(back_img, (width, height))
                                         screen.blit(win, (0, 0))
                                         pygame.display.flip()
-                                        pygame.time.wait(15555)
+                                        pygame.time.wait(10000)
+                                        running = False
+                                        
                                 else:
                                     # Decreasing time
                                     reduce_game_timer()
@@ -1264,7 +1273,8 @@ while running:
                 lose = pygame.transform.scale(back_img, (width, height))
                 screen.blit(lose, (0, 0))
                 pygame.display.flip()
-                pygame.time.wait(15555)
+                pygame.time.wait(10000)
+                running = False
 
             # Draw game screen
             draw_game_screen(assets)
